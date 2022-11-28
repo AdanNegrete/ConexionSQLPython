@@ -1,0 +1,5 @@
+# Ignora la carpeta env
+env
+
+#Ignora el archivo .gitignore
+#.gitignore
