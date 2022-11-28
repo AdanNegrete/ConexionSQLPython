@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 import pyodbc
 
 Server = Flask(__name__)
@@ -13,8 +13,19 @@ def connection():
     return conn
 
 @Server.route("/") #For default route
+def Index():
+    return render_template("index.html")
 
-def main():
+@Server.route("/listex", methods=['POST'])
+def listex():
+    if request.method == 'POST':
+        opt=request.form['Consulta']
+        if opt == '01':
+            return redirect(url_for('consulta'))
+        #elif opt == '02':
+
+@Server.route("/consulta")
+def consulta():
     products = []
     conn = connection()
     cursor = conn.cursor()
@@ -24,8 +35,5 @@ def main():
     conn.close()
     return render_template("resultlist.html", products = products)
 
-def main():
-    return render_template("resultlist.html")
-
 if(__name__ == "__main__"):
-    Server.run()
+    Server.run(debug=True)
