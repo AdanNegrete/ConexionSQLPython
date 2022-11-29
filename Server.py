@@ -5,6 +5,11 @@ Server = Flask(__name__)
 Server.secret_key="ScrtKy"
 
 inst=''
+instancias={
+    'sales': 'NEGA-PC',
+    'production': 'NEGA-PC',
+    'other': 'NEGA-PC'
+}
 
 def connection():
     s = inst #Your server name
@@ -21,11 +26,18 @@ def Index():
 
 @Server.route("/listex", methods=['POST'])
 def listex():
+    global inst, instancias
     if request.method == 'POST':
+        
         opt=request.form['Instancia']    
-        global inst  
+        
         if opt == '01':
-            inst='NEGA-PC'
+            inst=instancias.get('sales')
+        elif opt == '02':
+            inst=instancias.get('production')
+        elif opt == '03':
+            inst=instancias.get('other')    
+        
         return redirect(url_for('consulta'))
 
 @Server.route("/consulta")
