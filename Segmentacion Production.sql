@@ -1,10 +1,8 @@
 /************************************************
 Segmentación del esquema y creacion de Triggers en base PRODUCTION
 ***********************************************/
-go
-create database Productionbd
-go
-use Productionbd
+
+use Equipo6
 --Creacion esquema en BD Production
 Create schema Production
 go
