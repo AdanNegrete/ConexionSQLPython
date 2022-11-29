@@ -1,4 +1,6 @@
 {% include 'header.html' %}   
+    <br/>
+
     <h2>Product List</h2>
     <form id="formulario" method="post" action="/listex">
         <label for="Consulta">Seleccione la consulta</label> <br/>
@@ -9,8 +11,8 @@
             <option  value="04">Consulta 4</option>
             <option  value="05">Consulta 5</option>
         </select>
-        <button type="submit">
-            Ver
+        <button type="submit" class="btn btn-success">
+            Iniciar Conexión
         </button>
     </form>
 {% include 'footer.html' %}
