@@ -1,5 +1,5 @@
 /************************************************
-Segmentación del esquema y creacion de Triggers en base PRODUCTION
+SegmentaciÃ³n del esquema y creacion de Triggers en base PRODUCTION
 ***********************************************/
 go
 create database Productionbd
@@ -35,22 +35,7 @@ select productid, locationid, shelf, bin, quantity
 	from AdventureWorks2019.production.ProductInventory
 	--Ver que los datos se copiaron del LS al esquema
 select * from production.ProductInventory
------------------------------------------------------------------------------- ERROR
-/*
-ERROR
-NO SE CREO LA TABLA
-*/
-go
-use AdventureWorks
-go
 
---NO PERMITE XML
-select productmodelid, name, catalogdescription, instructions
-	into Production.productmodel
-	--from (select productmodelid, name, catalogdescription, instructions from 
-	from AdventureWorks2019.production.productmodel
-	--Ver que los datos se copiaron del LS al esquema
-select * from production.productmodel
 ------------------------------------------------------------------------------ LISTO
 select locationid, name, costrate, availability
 	into Production.Location
