@@ -1,18 +1,35 @@
 {% include 'header.html' %}   
     <br/>
 
-    <h2>Product List</h2>
+    <h2>Generando Conexión</h2>
     <form id="formulario" method="post" action="/listex">
-        <label for="Consulta">Seleccione la consulta</label> <br/>
-        <select id="Consulta" name="Consulta">
-            <option  value="01">Consulta 1</option>
-            <option  value="02">Consulta 2</option>
-            <option  value="03">Consulta 3</option>
-            <option  value="04">Consulta 4</option>
-            <option  value="05">Consulta 5</option>
-        </select>
-        <button type="submit" class="btn btn-success">
-            Iniciar Conexión
-        </button>
+
+        <div class="card">
+            <div class="card-header">
+                Escoge la instancia a utilizar
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Instancias</h5>
+                <p class="card-text">
+                    
+                    <div class="form-group">
+                        <label for="Consulta">Seleccione la instancia</label>
+                        <select id="Consulta" name="Consulta">
+                            <option  value="01">Ventas</option>
+                            <option  value="02">Producción</option>
+                            <option  value="03">Otros</option>
+                        </select>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">
+                            Iniciar Conexión
+                        </button>
+                    </div>
+
+                </p>
+            </div>
+        </div>
+
     </form>
 {% include 'footer.html' %}
