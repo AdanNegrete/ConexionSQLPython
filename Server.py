@@ -2,10 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import pyodbc
 
 Server = Flask(__name__)
+Server.secret_key="ScrtKy"
+
+inst=''
 
 def connection():
-    s = 'NEGA-PC' #Your server name 
-    d = 'AdventureWorks' 
+    s = inst #Your server name
+    d = 'AdventureWorks' #Your db name
     u = 'sa' #Your login
     p = '123456' #Your login password
     cstr = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER='+s+';DATABASE='+d+';UID='+u+';PWD='+ p
@@ -19,14 +22,19 @@ def Index():
 @Server.route("/listex", methods=['POST'])
 def listex():
     if request.method == 'POST':
-        opt=request.form['Consulta']
+        opt=request.form['Instancia']    
+        global inst  
         if opt == '01':
-            return redirect(url_for('consulta'))
-        #elif opt == '02':
+            inst='NEGA-PC'
+        return redirect(url_for('consulta'))
 
 @Server.route("/consulta")
 def consulta():
     products = []
+    global inst
+    if inst == '':
+        flash('Error en la instancia seleccionada')
+        return redirect(url_for('Index'))
     conn = connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Production.product")

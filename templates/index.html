@@ -1,4 +1,15 @@
 {% include 'header.html' %}   
+    
+    {% with messages= get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-danger" role="alert">
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <br/>
 
     <h2>Generando Conexión</h2>
@@ -13,8 +24,8 @@
                 <p class="card-text">
                     
                     <div class="form-group">
-                        <label for="Consulta">Seleccione la instancia</label>
-                        <select id="Consulta" name="Consulta">
+                        <label for="Instancia">Seleccione la instancia</label>
+                        <select id="Instancia" name="Instancia">
                             <option  value="01">Ventas</option>
                             <option  value="02">Producción</option>
                             <option  value="03">Otros</option>
