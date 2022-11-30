@@ -34,3 +34,34 @@ inner join sales.SalesTerritory t
 on soh.TerritoryID = t.TerritoryID
 group by t.[Group], sod.ProductID
 having count(sod.ProductID) = (select max(col) from ())
+
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- Consulta A
+
+select soh.TerritoryID, sum(t.LineTotal) as total_venta
+from AdventureWorks2019.sales.SalesOrderHeader soh
+inner join
+(select salesorderid, productid, orderqty, linetotal
+from AdventureWorks2019. sales.salesorderdetail sod
+where ProductID in (
+		select productid
+		from AdventureWorks2019.Production.Product
+		where ProductSubcategoryID in (
+			select ProductSubcategoryID
+			from AdventureWorks2019.Production.ProductSubcategory
+			where ProductCategoryID in (
+				select ProductCategoryID
+				from AdventureWorks2019.Production.ProductCategory
+				where ProductCategoryID = 1
+				)
+			)
+	)
+) as T
+inner join
+(select [name], TerritoryID 
+from AdventureWorks2019.sales.SalesTerritory) as n
+on TerritoryID = n.TerritoryID
+on soh.SalesOrderID = t.SalesOrderID
+group by soh.TerritoryID
+order by soh.TerritoryID
+go
