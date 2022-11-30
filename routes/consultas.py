@@ -49,8 +49,14 @@ def consulta():
 
 @consultas.route("/consulta_a")
 def consulta_a():
-    
-    return render_template('consulta_a.html')
+    territorys = []
+    conn = connection(inst)
+    cursor = conn.cursor()
+    cursor.execute()
+    for row in cursor.fetchall():
+        territorys.append({"id": row[0], "name": row[1]})
+    conn.close()
+    return render_template('consulta_a.html', territorys = territorys)
 
 @consultas.route("/consulta_b")
 def consulta_b():
