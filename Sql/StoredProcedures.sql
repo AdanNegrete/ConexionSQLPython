@@ -111,45 +111,60 @@ EXECUTE sp_productoSolicitado 'Pacific'
 /**********************************************************************************************/
 -- Consulta E
 -- Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
-CREATE OR ALTER usp_ConsEUpdtSales (@cant varchar(max), @salesID varchar(3), @productID varchar(3), @InstS varchar(max), @InstP varchar(max)) AS
+GO
+CREATE OR ALTER PROCEDURE usp_ConsEUpdtSales (@cant varchar(max), @salesID varchar(20), @productID varchar(20), @InstS varchar(max), @InstP varchar(max)) AS
 BEGIN
 	BEGIN TRAN
-	DECLARE @SQL_CONS1 = 'select * from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail where SalesOrderID = '+@salesID+' and ProductID = '+@productID 
-	DECLARE @SQL_CONS2 =
-	if exists(select * from AdventureWorks2019.Sales.SalesOrderDetail 
-		where SalesOrderID = @salesID and ProductID = @productID)
+	
+	DECLARE @SQL_CONS1 nVARCHAR(MAX), @SQL_CONS2 nVARCHAR(MAX)
+	DECLARE @SQL_UPDT1 nVARCHAR(MAX), @SQL_UPDT2 nVARCHAR(MAX)
+	DECLARE @salida_c1 nvarchar(max), @salida_c2 nvarchar(max)
+	DECLARE @params_c1 nvarchar(max), @params_c2 nvarchar(max)
+
+	-- Ejecutando primer query de verificación de existencia
+	SET @SQL_CONS1 = 'select @salida_out_1=SalesOrderID from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail where SalesOrderID = '+@salesID+' and ProductID = '+@productID+';' 
+	SET @params_c1 = N'@salida_out_1 nvarchar(max) OUTPUT';
+
+	-- Ejecutando segundo query de verificación de inventario
+	SET @SQL_CONS2 = 'select top 1 @salida_out_2=LocationID from ['+@InstP+'].AW_Equipo6.Production.ProductInventory where ProductID = '+@productID+' and Quantity >= '+@cant+';' 
+	SET @params_c2 = N'@salida_out_2 nvarchar(max) OUTPUT';
+
+	-- Preparando querys de Update
+	SET @SQL_UPDT1 = 'update ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail set OrderQty = OrderQty + '+@cant+' where SalesOrderID = '+@salesID+' and ProductID = '+@productID+';' 
+	SET @SQL_UPDT2 = 'update ['+@InstP+'].AW_Equipo6.Production.ProductInventory set Quantity = Quantity - '+@cant+' where ProductID = '+@productID+' and LocationID = '+@salida_c2+';'
+
+	EXEC sys.[sp_executesql] @SQL_CONS1,@params_c1,@salida_out_1 = @salida_c1 OUTPUT
+	EXEC sys.[sp_executesql] @SQL_CONS2,@params_c2,@salida_out_2 = @salida_c2 OUTPUT
+
+	if @salida_c1 = @salesID
 		begin
-			if exists(select top 1 LocationID from AdventureWorks2019.Production.ProductInventory
-						where ProductID = @productID and Quantity >= @cant )
+			
+			if @salida_c2 is NOT NULL
 				begin
 					--actualizando venta
-					update AdventureWorks2019.Sales.SalesOrderDetail 
-					set OrderQty = OrderQty + @cant
-					where SalesOrderID = @salesID and ProductID = @productID
-
-					 --asignando a que locaci�n se le retirar� stock
-					declare @locationID int
-					set @locationID = (select top 1 LocationID from AdventureWorks2019.Production.ProductInventory
-					where ProductID = @productID and Quantity >= @cant)
+					EXEC sys.[sp_executesql] @SQL_UPDT1;
 
 					--Cambiar el Stock del producto
-					update AdventureWorks2019.Production.ProductInventory
-					set Quantity = Quantity - @cant
-					where ProductID = @productID and LocationID = @locationID
+					EXEC sys.[sp_executesql] @SQL_UPDT2;
 				end
 			else
 				begin 
 					select null --Si no hay productos en existencia
+					print N'No hay productos en existencia'
 				end
-			end
-			else
-				begin
-				select null --Si el producto no existe
-				end
-			end
+		end
+	else
+		begin
+			select null, @salida_c1, @salesID --Si el producto no existe
+			print N'El producto no se encuentra en la orden'
+		end
+COMMIT TRAN
+END
+
+
 go
 ------------------------------------------------------------------------------------------------------
-exec EUpdateSales @cant = 1, @salesID = 43659, @productID  = 776
+exec usp_ConsEUpdtSales '5', '43659', '776', 'NEGA-PC', 'NEGA-PC'
 go
 
 /**********************************************************************************************/
