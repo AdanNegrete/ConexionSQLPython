@@ -38,7 +38,7 @@ def consulta():
     global inst
     if inst == '':
         flash('Error en la instancia seleccionada')
-        return redirect(url_for('Index'))
+        return redirect(url_for('consultas.Index'))
     conn = connection(inst)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Production.product")
@@ -49,7 +49,8 @@ def consulta():
 
 @consultas.route("/consulta_a")
 def consulta_a():
-    return "Consulta A"
+    
+    return render_template('consulta_a.html')
 
 @consultas.route("/consulta_b")
 def consulta_b():

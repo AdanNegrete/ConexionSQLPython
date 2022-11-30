@@ -6,6 +6,7 @@ USE AW_Equipo6
     Segmentación del esquema PRODUCTION
 ***********************************************/
 --Creacion esquema en BD Production
+go
 Create schema Production
 go
 ------------------------------------------------------------------------------ LISTO
@@ -45,6 +46,7 @@ select * from production.Location
 /************************************************
     Segmentación del esquema SALES
 ***********************************************/
+go
 Create schema sales
 go
 ------------------------------------------------------------------------------ LISTO
@@ -103,7 +105,7 @@ select businessentityid, name,  salespersonid
 select * from  sales.Store
 
 ------------------------------------------------------------------------------ LISTO
-select territoryid, name, countryregioncode, [Group], salesytd,
+select territoryid, [name], countryregioncode, [Group], salesytd,
 	saleslastyear, costytd, costlastyear
 	INTO sales.SalesTerritory
 	from AdventureWorks2019.sales.SalesTerritory
