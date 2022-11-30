@@ -11,7 +11,7 @@ on a.TerritoryID=b.TerritoryID
 
 
 select c.customerid
-from sales.customer c inner join sales.salesorderheader soh
+from AdventureWorks2019.sales.customer c inner join AdventureWorks2019.sales.salesorderheader soh
 on c.territoryid = soh.territoryid
 and c.customerid = soh.customerid
 
@@ -20,17 +20,17 @@ and c.customerid = soh.customerid
 --Esa funciona, compara que el cliente sea el mismo y el territorio sea diferente
 --D)
 select c.customerid
-from sales.Customer c inner join sales.SalesOrderHeader soh
+from AdventureWorks2019.sales.Customer c inner join AdventureWorks2019.sales.SalesOrderHeader soh
 on c.TerritoryID != soh.TerritoryID
 and c.CustomerID != soh.CustomerID
 
 select * from Sales.SalesTerritory
 
 select t.[group], sod.ProductID, count(ProductId) as col
-from sales.SalesOrderDetail sod
-inner join sales.SalesOrderHeader soh
+from AdventureWorks2019.sales.SalesOrderDetail sod
+inner join AdventureWorks2019.sales.SalesOrderHeader soh
 on sod.SalesOrderID = soh.SalesOrderID
-inner join sales.SalesTerritory t
+inner join AdventureWorks2019.sales.SalesTerritory t
 on soh.TerritoryID = t.TerritoryID
 group by t.[Group], sod.ProductID
 having count(sod.ProductID) = (select max(col) from ())
@@ -73,5 +73,12 @@ go
 /**********************************************************************************************/
 --D
 
+select t.[group], sod.ProductID, count(ProductId) as col
+from AdventureWorks2019.sales.SalesOrderDetail sod
+inner join AdventureWorks2019.sales.SalesOrderHeader soh
+on sod.SalesOrderID = soh.SalesOrderID
+inner join AdventureWorks2019.sales.SalesTerritory t
+on soh.TerritoryID = t.TerritoryID
+group by t.[Group], sod.ProductID
 /**********************************************************************************************/
 --E
