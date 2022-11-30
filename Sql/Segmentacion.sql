@@ -135,4 +135,39 @@ if not exists (select productID
 /************************************************
     Segmentación del esquema OTHER
 ***********************************************/
+create schema Other
+go
 
+/*Tablas para Other
+
+Person
+EmailAddress
+PurchaseOrderHeader
+PurchaseOrderDetail
+Employee
+*/
+
+/**********************************************************************************************/
+	select BusinessEntityID, PersonType, FirstName, MiddleName, LastName, EmailPromotion, ModifiedDate
+	into Other.Person
+	from AdventureWorks2019.Person.Person
+
+/**********************************************************************************************/
+	select BusinessEntityID, EmailAddress, ModifiedDate
+	into Other.EmailAddress
+	from AdventureWorks2019.Person.EmailAddress
+
+/**********************************************************************************************/
+	select PurchaseOrderID, DueDate, OrderQty, UnitPrice, LineTotal, ModifiedDate
+	into Other.PurchaseOrderDetail
+	from AdventureWorks2019.Purchasing.PurchaseOrderDetail
+
+/**********************************************************************************************/
+	select PurchaseOrderID, RevisionNumber, [Status], EmployeeID, VendorID, OrderDate, SubTotal, ModifiedDate  
+	into Other.PurchaseOrderHeader
+	from AdventureWorks2019.Purchasing.PurchaseOrderHeader
+
+/**********************************************************************************************/
+	select BusinessEntityID, NationalIDNumber, JobTitle 
+	into Other.Employee
+	from AdventureWorks2019.HumanResources.Employee
