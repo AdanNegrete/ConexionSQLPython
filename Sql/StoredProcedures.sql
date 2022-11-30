@@ -175,3 +175,26 @@ go
 select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
 exec UpdateShip @method = 3,@salesID = 43659
 go
+/**********************************************************************************************/
+-- Consulta F
+--Actualizar el método de envío de una orden que se reciba como argumento
+
+create procedure UpdateEmail (@customerID varchar (10), @newEmail varchar(50)) as
+begin
+	if exists(select * from AdventureWorks2019.Sales.Customer
+	where CustomerID = @customerID and PersonID is not null)
+		begin
+			update AdventureWorks2019.Person.EmailAddress	
+			set EmailAddress = @newEmail
+			where BusinessEntityID = (
+				select PersonID from AdventureWorks2019.Sales.Customer
+				where CustomerID = @customerID)
+		end
+	else
+		begin
+			select null
+		end
+end
+go
+
+exec UpdateEmail @customerID = 11000, @newemail = 'asasasasasa'
