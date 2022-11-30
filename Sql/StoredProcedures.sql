@@ -61,6 +61,54 @@ EXEC usp_ConsATVTerr '01', 'NEGA-PC', 'NEGA-PC'
 go
 
 /**********************************************************************************************/
+-- Consulta B
+----Determinar producto mas solicitado
+CREATE PROCEDURE sp_productoSolicitado @p_group nvarchar(50)  
+AS
+BEGIN 
+	'SELECT
+	TOP 1 SUM(T.lineTotal) as total_ventas,
+	p.Name as Nombre,
+	p.ProductID
+FROM
+	['+@InstP+'].AW_Equipo6.Production.Product p
+inner join(
+	SELECT
+		ProductID,
+		lineTotal
+	FROM
+		['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail sod
+	WHERE
+		SalesOrderID in(
+		SELECT
+			SalesOrderID
+		FROM
+			['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader soh
+		WHERE
+			TerritoryID in(
+			SELECT
+				TerritoryID
+			FROM
+				['+@InstS+'].AW_Equipo6.Sales.SalesTerritory st
+			WHERE
+				[Group] = @p_group
+			)
+		)
+	) as T
+	on
+	p.ProductID = T.ProductID
+GROUP BY
+	p.Name,
+	p.ProductID
+ORDER by
+	total_ventas DESC
+	'
+END 
+------------------------------------------------------------------------------------------------------
+EXECUTE sp_productoSolicitado 'Pacific'
+
+
+/**********************************************************************************************/
 -- Consulta E
 -- Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
 create procedure EUpdateSales (@cant int, @salesID int, @productID int) as
@@ -77,7 +125,7 @@ begin
 					set OrderQty = OrderQty + @cant
 					where SalesOrderID = @salesID and ProductID = @productID
 
-					 --asignando a que locación se le retirará stock
+					 --asignando a que locaciï¿½n se le retirarï¿½ stock
 					declare @locationID int
 					set @locationID = (select top 1 LocationID from AdventureWorks2019.Production.ProductInventory
 					where ProductID = @productID and Quantity >= @cant)
