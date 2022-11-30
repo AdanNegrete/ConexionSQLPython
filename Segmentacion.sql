@@ -19,6 +19,7 @@ select productid, name, productnumber, color, safetystocklevel,
 	--Ver que los datos se copiaron del LS al esquema
 select * from Production.product
 ------------------------------------------------------------------------------ LISTO
+--
 select productcategoryid, name
    into Production.ProductCategory
    from AdventureWorks2019.production.ProductCategory
