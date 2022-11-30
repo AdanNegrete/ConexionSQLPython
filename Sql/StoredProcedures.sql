@@ -151,7 +151,7 @@ exec EUpdateSales @cant = 1, @salesID = 43659, @productID  = 776
 go
 
 /**********************************************************************************************/
--- Consulta E
+-- Consulta F
 --Actualizar el método de envío de una orden que se reciba como argumento
 create procedure UpdateShip (@method int, @salesID int) as
 begin
