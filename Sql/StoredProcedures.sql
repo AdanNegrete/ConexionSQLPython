@@ -61,6 +61,54 @@ EXEC usp_ConsATVTerr '01', 'NEGA-PC', 'NEGA-PC'
 go
 
 /**********************************************************************************************/
+-- Consulta B
+----Determinar producto mas solicitado
+CREATE PROCEDURE sp_productoSolicitado @p_group nvarchar(50)  
+AS
+BEGIN 
+	'SELECT
+	TOP 1 SUM(T.lineTotal) as total_ventas,
+	p.Name as Nombre,
+	p.ProductID
+FROM
+	['+@InstP+'].AW_Equipo6.Production.Product p
+inner join(
+	SELECT
+		ProductID,
+		lineTotal
+	FROM
+		['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail sod
+	WHERE
+		SalesOrderID in(
+		SELECT
+			SalesOrderID
+		FROM
+			['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader soh
+		WHERE
+			TerritoryID in(
+			SELECT
+				TerritoryID
+			FROM
+				['+@InstS+'].AW_Equipo6.Sales.SalesTerritory st
+			WHERE
+				[Group] = @p_group
+			)
+		)
+	) as T
+	on
+	p.ProductID = T.ProductID
+GROUP BY
+	p.Name,
+	p.ProductID
+ORDER by
+	total_ventas DESC
+	'
+END 
+------------------------------------------------------------------------------------------------------
+EXECUTE sp_productoSolicitado 'Pacific'
+
+
+/**********************************************************************************************/
 -- Consulta E
 -- Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
 CREATE OR ALTER EUpdateSales (@cant varchar(max), @salesID varchar(3), @productID varchar(3), @InstS varchar(max), @InstP varchar(max)) AS
@@ -102,4 +150,28 @@ BEGIN
 go
 ------------------------------------------------------------------------------------------------------
 exec EUpdateSales @cant = 1, @salesID = 43659, @productID  = 776
+go
+
+/**********************************************************************************************/
+-- Consulta F
+--Actualizar el método de envío de una orden que se reciba como argumento
+create procedure UpdateShip (@method int, @salesID int) as
+begin
+	if exists(select * from AdventureWorks2019.Purchasing.ShipMethod
+		where ShipMethodID = @method)
+		begin
+			--Actualizar metodo de envio
+			update AdventureWorks2019.Sales.SalesOrderHeader
+			set ShipMethodID = @method
+			where SalesOrderID = @salesID
+		end
+	else
+		begin
+			select null --En caso de que no exista
+		end
+end
+go	
+------------------------------------------------------------------------------------------------------
+select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
+exec UpdateShip @method = 3,@salesID = 43659
 go
