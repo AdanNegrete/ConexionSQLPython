@@ -52,7 +52,7 @@ def consulta_a():
     territorys = []
     conn = connection(inst)
     cursor = conn.cursor()
-    cursor.execute()
+    cursor.execute("EXEC (EXEC usp_TerritoryList ?,?) AT ?",inst,inst,inst)
     for row in cursor.fetchall():
         territorys.append({"id": row[0], "name": row[1]})
     conn.close()
