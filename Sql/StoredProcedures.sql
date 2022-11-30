@@ -158,13 +158,14 @@ begin
 	if exists(select * from AdventureWorks2019.Purchasing.ShipMethod
 		where ShipMethodID = @method)
 		begin
+			--Actualizar metodo de envio
 			update AdventureWorks2019.Sales.SalesOrderHeader
 			set ShipMethodID = @method
 			where SalesOrderID = @salesID
 		end
 	else
 		begin
-			select null
+			select null --En caso de que no exista
 		end
 end
 go	
