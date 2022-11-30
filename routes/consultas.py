@@ -46,23 +46,41 @@ def consulta():
         products.append({"id": row[0], "name": row[1], "lsprice": row[2]})
     conn.close()
     return render_template("resultlist.html", products = products)
-
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @consultas.route("/consulta_a")
 def consulta_a():
+    global instancias
     global inst
-    territorys = []
-    if inst == '':
-        flash('Error en la instancia seleccionada')
-        return redirect(url_for('consultas.Index'))
+    categories = []
     conn = connection(inst)
     cursor = conn.cursor()
-    cursor.execute("EXEC dbo.usp_TerritoryList ?",inst)
+    cursor.execute("EXEC dbo.usp_CategoryList ?",instancias.get('production'))
     print(cursor)
     for row in cursor.fetchall():
-        territorys.append({"id": row[0], "name": row[1]})
+        categories.append({"id": row[0], "name": row[1]})
     conn.close()
-    return render_template('consulta_a.html', territorys = territorys)
+    return render_template('consulta_a.html', categories = categories)
 
+@consultas.route("/consatrr", methods=['POST'])
+def consatrr():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        opt=request.form['Categoria']
+        ventas = []
+        if inst == '':
+            flash('Error en la instancia seleccionada')
+            return redirect(url_for('consultas.Index'))
+        conn = connection(inst)
+        cursor = conn.cursor()
+        cursor.execute("EXEC dbo.usp_ConsATVTerr ?,?,?",opt,instancias.get('sales'),instancias.get('production'))
+        
+        for row in cursor.fetchall():
+            ventas.append({"TerrName": row[0], "VentasTotales": row[1]})
+        conn.close()
+
+        return redirect(url_for('consultas.consulta_a'))
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @consultas.route("/consulta_b")
 def consulta_b():
     return "Consulta B"

@@ -1,19 +1,19 @@
 {% include 'header.html' %}
-<form id="formulario" method="post" action="/listex">
+<form id="formulario" method="post" action="/consatrr">
 
     <div class="card">
         <div class="card-header">
             Consulta A
         </div>
         <div class="card-body">
-            <h5 class="card-title">Instancias</h5>
+            <h5 class="card-title">Ventas Totales</h5>
             <p class="card-text">
                 
                 <div class="form-group">
-                    <label for="Instancia">Seleccione el territorio</label>
-                    <select id="Instancia" name="Instancia">
-                        {% for territory in territorys %}
-                            <option  value={{territory.id}}>{{territory.name}}</option>
+                    <label for="Categoria">Seleccione la Categoría: </label>
+                    <select id="Categoria" name="Categoria">
+                        {% for category in categories %}
+                            <option  value={{category.id}}>{{category.name}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -29,10 +29,5 @@
     </div>
 
 </form>
-
-<div class="container-fluid">
-    
-</div>">
-
-</div>
+{% include 'tables_dep/table_a.html' %}
 {% include 'footer.html' %}

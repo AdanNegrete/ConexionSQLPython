@@ -43,6 +43,12 @@ select locationid, name, costrate, availability
 	from AdventureWorks2019.production.Location
 	--Ver que los datos se copiaron del LS al esquema
 select * from production.Location
+------------------------------------------------------------------------------ LISTO
+select productsubcategoryid, name, productcategoryID
+   into Production.ProductSubCategory
+   from AdventureWorks2019.production.ProductSubcategory
+	--Ver que los datos se copiaron del LS al esquema
+select * from Production.ProductSubCategory
 
 /************************************************
     Segmentación del esquema SALES
