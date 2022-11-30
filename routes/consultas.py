@@ -49,10 +49,15 @@ def consulta():
 
 @consultas.route("/consulta_a")
 def consulta_a():
+    global inst
     territorys = []
+    if inst == '':
+        flash('Error en la instancia seleccionada')
+        return redirect(url_for('consultas.Index'))
     conn = connection(inst)
     cursor = conn.cursor()
-    cursor.execute("EXEC (EXEC usp_TerritoryList ?,?) AT ?",inst,inst,inst)
+    cursor.execute("EXEC dbo.usp_TerritoryList ?",inst)
+    print(cursor)
     for row in cursor.fetchall():
         territorys.append({"id": row[0], "name": row[1]})
     conn.close()
