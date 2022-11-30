@@ -63,9 +63,11 @@ go
 /**********************************************************************************************/
 -- Consulta E
 -- Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
-create procedure EUpdateSales (@cant int, @salesID int, @productID int) as
-begin
-	
+CREATE OR ALTER EUpdateSales (@cant varchar(max), @salesID varchar(3), @productID varchar(3), @InstS varchar(max), @InstP varchar(max)) AS
+BEGIN
+	BEGIN TRAN
+	DECLARE @SQL_CONS1 = 'select * from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail where SalesOrderID = '+@salesID+' and ProductID = '+@productID 
+	DECLARE @SQL_CONS2 =
 	if exists(select * from AdventureWorks2019.Sales.SalesOrderDetail 
 		where SalesOrderID = @salesID and ProductID = @productID)
 		begin
@@ -77,7 +79,7 @@ begin
 					set OrderQty = OrderQty + @cant
 					where SalesOrderID = @salesID and ProductID = @productID
 
-					 --asignando a que locación se le retirará stock
+					 --asignando a que locaciï¿½n se le retirarï¿½ stock
 					declare @locationID int
 					set @locationID = (select top 1 LocationID from AdventureWorks2019.Production.ProductInventory
 					where ProductID = @productID and Quantity >= @cant)
