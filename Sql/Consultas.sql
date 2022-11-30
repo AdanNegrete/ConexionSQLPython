@@ -70,6 +70,35 @@ go
 /**********************************************************************************************/
 --C
 
+create or alter procedure cc_updateLocation (@localidad int, @cat int) as
+begin
+	if exists(select *
+		from AdventureWorks2017.Production.ProductInventory as pii
+		where pii.LocationID = @localidad and
+		ProductID in (
+			select ProductID
+			from AdventureWorks2017.Production.ProductSubcategory
+			where ProductCategoryID = @cat
+		)) 
+		begin
+			update AdventureWorks2017.Production.ProductInventory
+			set Quantity = Quantity + ROUND((Quantity * 0.05), 0)
+			from AdventureWorks2017.Production.ProductInventory as pii
+			where pii.LocationID = @localidad and
+			ProductID in (
+				select ProductID
+				from AdventureWorks2017.Production.ProductSubcategory
+				where ProductCategoryID = @cat
+			)
+		end
+	else
+		begin
+			SELECT NULL
+		end
+end
+
+exec cc_updateLocation @localidad = 60, @cat = 1
+
 /**********************************************************************************************/
 --D
 
@@ -82,3 +111,41 @@ on soh.TerritoryID = t.TerritoryID
 group by t.[Group], sod.ProductID
 /**********************************************************************************************/
 --E
+create procedure EUpdateSales (@cant int, @salesID int, @productID int) as
+begin
+
+	if exists(select * from AdventureWorks2019.Sales.SalesOrderDetail 
+		where SalesOrderID = @salesID and ProductID = @productID)
+		begin
+			if exists(select top 1 LocationID from AdventureWorks2019.Production.ProductInventory
+						where ProductID = @productID and Quantity >= @cant )
+				begin
+					--actualizando venta
+					update AdventureWorks2019.Sales.SalesOrderDetail 
+					set OrderQty = OrderQty + @cant
+					where SalesOrderID = @salesID and ProductID = @productID
+
+					 --asignando a que locación se le retirará stock
+					declare @locationID int
+					set @locationID = (select top 1 LocationID from AdventureWorks2019.Production.ProductInventory
+					where ProductID = @productID and Quantity >= @cant)
+
+					--Cambiar el Stock del producto
+					update AdventureWorks2019.Production.ProductInventory
+					set Quantity = Quantity - @cant
+					where ProductID = @productID and LocationID = @locationID
+				end
+			else
+				begin 
+					select null --Si no hay productos en existencia
+				end
+			end
+			else
+				begin
+				select null --Si el producto no existe
+				end
+			end
+go
+------------------------------------------------------------------------------------------------------
+exec EUpdateSales @cant = 1, @salesID = 43659, @productID  = 776
+go
