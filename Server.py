@@ -1,7 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+from routes.consultas import consultas
+from routes.principal import principal
 import pyodbc
 
 Server = Flask(__name__)
+Server.register_blueprint(consultas)
+principal.register_blueprint(principal)
 Server.secret_key="ScrtKy"
 
 inst=''
@@ -19,26 +23,6 @@ def connection():
     cstr = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER='+s+';DATABASE='+d+';UID='+u+';PWD='+ p
     conn = pyodbc.connect(cstr)
     return conn
-
-@Server.route("/") #For default route
-def Index():
-    return render_template("index.html")
-
-@Server.route("/listex", methods=['POST'])
-def listex():
-    global inst, instancias
-    if request.method == 'POST':
-        
-        opt=request.form['Instancia']    
-        
-        if opt == '01':
-            inst=instancias.get('sales')
-        elif opt == '02':
-            inst=instancias.get('production')
-        elif opt == '03':
-            inst=instancias.get('other')    
-        
-        return redirect(url_for('consulta'))
 
 @Server.route("/consulta")
 def consulta():
