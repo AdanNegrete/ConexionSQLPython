@@ -111,7 +111,7 @@ EXECUTE sp_productoSolicitado 'Pacific'
 /**********************************************************************************************/
 -- Consulta E
 -- Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
-CREATE OR ALTER EUpdateSales (@cant varchar(max), @salesID varchar(3), @productID varchar(3), @InstS varchar(max), @InstP varchar(max)) AS
+CREATE OR ALTER usp_ConsEUpdtSales (@cant varchar(max), @salesID varchar(3), @productID varchar(3), @InstS varchar(max), @InstP varchar(max)) AS
 BEGIN
 	BEGIN TRAN
 	DECLARE @SQL_CONS1 = 'select * from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail where SalesOrderID = '+@salesID+' and ProductID = '+@productID 
