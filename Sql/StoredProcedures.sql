@@ -149,3 +149,26 @@ go
 ------------------------------------------------------------------------------------------------------
 exec EUpdateSales @cant = 1, @salesID = 43659, @productID  = 776
 go
+
+/**********************************************************************************************/
+-- Consulta E
+--Actualizar el método de envío de una orden que se reciba como argumento
+create procedure UpdateShip (@method int, @salesID int) as
+begin
+	if exists(select * from AdventureWorks2019.Purchasing.ShipMethod
+		where ShipMethodID = @method)
+		begin
+			update AdventureWorks2019.Sales.SalesOrderHeader
+			set ShipMethodID = @method
+			where SalesOrderID = @salesID
+		end
+	else
+		begin
+			select null
+		end
+end
+go	
+------------------------------------------------------------------------------------------------------
+select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
+exec UpdateShip @method = 3,@salesID = 43659
+go
