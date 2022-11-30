@@ -19,7 +19,7 @@
                 </div>
                 <br/>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
                         Buscar
                     </button>
                 </div>
@@ -29,5 +29,23 @@
     </div>
 
 </form>
-{% include 'tables_dep/table_a.html' %}
+<script></script>
+<div id="tabla_a">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Territorio</th>
+            <th scope="col">Ventas Totales</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+                <tr>
+                    <td>{{ venta.TerrName }}</th>
+                    <td>{{ venta.VentasTotales }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% include 'footer.html' %}
