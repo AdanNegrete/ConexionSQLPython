@@ -56,6 +56,48 @@ COMMIT TRAN
 END
 
 GO
---Ejecucion del SP
+------------------------------------------------------------------------------------------------------
 EXEC usp_ConsATVTerr '01', 'NEGA-PC', 'NEGA-PC'
+go
+
+/**********************************************************************************************/
+-- Consulta E
+-- Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
+create procedure EUpdateSales (@cant int, @salesID int, @productID int) as
+begin
+	
+	if exists(select * from AdventureWorks2019.Sales.SalesOrderDetail 
+		where SalesOrderID = @salesID and ProductID = @productID)
+		begin
+			if exists(select top 1 LocationID from AdventureWorks2019.Production.ProductInventory
+						where ProductID = @productID and Quantity >= @cant )
+				begin
+					--actualizando venta
+					update AdventureWorks2019.Sales.SalesOrderDetail 
+					set OrderQty = OrderQty + @cant
+					where SalesOrderID = @salesID and ProductID = @productID
+
+					 --asignando a que locación se le retirará stock
+					declare @locationID int
+					set @locationID = (select top 1 LocationID from AdventureWorks2019.Production.ProductInventory
+					where ProductID = @productID and Quantity >= @cant)
+
+					--Cambiar el Stock del producto
+					update AdventureWorks2019.Production.ProductInventory
+					set Quantity = Quantity - @cant
+					where ProductID = @productID and LocationID = @locationID
+				end
+			else
+				begin 
+					select null --Si no hay productos en existencia
+				end
+			end
+			else
+				begin
+				select null --Si el producto no existe
+				end
+			end
+go
+------------------------------------------------------------------------------------------------------
+exec EUpdateSales @cant = 1, @salesID = 43659, @productID  = 776
 go
