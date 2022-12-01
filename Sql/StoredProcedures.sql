@@ -181,10 +181,11 @@ go
 ------------------------------------------------------------------------------------------------------
 exec usp_ConsEUpdtSales '5', '43659', '776', 'NEGA-PC', 'NEGA-PC'
 go
-
-/**********************************************************************************************/
--- Consulta F
---Actualizar el método de envío de una orden que se reciba como argumento
+/****************************************************************************/
+-------------------------------  CONSULTA F  -------------------------------
+--Actualizar el método de envío de una orden que se reciba como argumento 
+--en la instrucción de actualización
+/****************************************************************************/
 create procedure UpdateShip (@method int, @salesID int) as
 begin
 	if exists(select * from AdventureWorks2019.Purchasing.ShipMethod
@@ -205,10 +206,12 @@ go
 select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
 exec UpdateShip @method = 3,@salesID = 43659
 go
-/**********************************************************************************************/
--- Consulta G
---Actualizar el correo electronico de un id de entrada
 
+/****************************************************************************/
+-------------------------------  CONSULTA G  -------------------------------
+--Actualizar el correo electrónico de una cliente que se reciba como argumento 
+--en la instrucción de actualización
+/****************************************************************************/
 create procedure UpdateEmail (@customerID varchar (10), @newEmail varchar(50)) as
 begin
 	if exists(select * from AdventureWorks2019.Sales.Customer
@@ -227,4 +230,63 @@ begin
 end
 go
 
-exec UpdateEmail @customerID = 11000, @newemail = 'asasasasasa'
+exec UpdateEmail @customerID = 11000, @newemail = 'ejemplo@mail.com'
+
+/****************************************************************************/
+-------------------------------  CONSULTA H  -------------------------------
+--Determinar el empleado que atendió más ordenes por territorio/región
+/****************************************************************************/
+create procedure MejorEmpleado (@territory varchar(3)) as
+	begin
+		select top 1 SalesPersonID, count(SalesPersonID) NumPedidos, TerritoryID 
+		from AdventureWorks2019.Sales.SalesOrderHeader
+		where TerritoryID = @territory
+		group by SalesPersonID,TerritoryID
+		order by NumPedidos desc
+	end
+go
+------------------------------------------------------------------------------
+execute MejorEmpleado @territory= 5
+
+/****************************************************************************/
+-------------------------------  CONSULTA I  -------------------------------
+--Determinar paraun rango de fechas establecidas como argumento de entrada, 
+--cual es el total de las ventasen cada una de las regiones
+/****************************************************************************/
+create procedure Grupos_I (@f1 date, @f2 date) as
+	begin
+		select t.[Group], sum(sod.LineTotal) as VentasTotales
+		from AdventureWorks2019.sales.SalesOrderHeader soh
+		inner join AdventureWorks2019.sales.SalesOrderDetail sod
+		on soh.SalesOrderID = sod.SalesOrderID
+		inner join AdventureWorks2019.sales.SalesTerritory t
+		on soh.TerritoryID = t.TerritoryID
+		where OrderDate between @f1 AND @f2
+		group by t.[Group]
+	end
+go
+------------------------------------------------------------------------------
+execute Grupos_I @f1 = '2011-06-01', @f2 = '2011-12-31'
+
+/****************************************************************************/
+-------------------------------  CONSULTA J  -------------------------------
+--Determinar los5 productos menos vendidos en un rango de fecha 
+--establecido como argumento de entrada
+/****************************************************************************/
+create procedure PeoresVenta (@f1 date, @f2 date) as
+begin
+	set nocount on;
+	select top 5 sod.ProductID, sum(sod.LineTotal) Ventas
+	from AdventureWorks2019.Sales.SalesOrderHeader soh
+inner join AdventureWorks2019.Sales.SalesOrderDetail sod
+	on soh.SalesOrderID = sod.SalesOrderID
+	where OrderDate BETWEEN @f1 AND @f2
+	group by sod.ProductID
+	order by ventas desc
+end
+go
+------------------------------------------------------------------------------
+exec PeoresVenta '2011-05-01','2011-05-31';
+go
+
+
