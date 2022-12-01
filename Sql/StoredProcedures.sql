@@ -131,6 +131,7 @@ BEGIN
 	DECLARE @SQL_UPDT1 nVARCHAR(MAX), @SQL_UPDT2 nVARCHAR(MAX)
 	DECLARE @salida_c1 nvarchar(max), @salida_c2 nvarchar(max)
 	DECLARE @params_c1 nvarchar(max), @params_c2 nvarchar(max)
+	DECLARE @msg varchar(max)
 
 	-- Ejecutando primer query de verificación de existencia
 	SET @SQL_CONS1 = 'select @salida_out_1=SalesOrderID from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail where SalesOrderID = '+@salesID+' and ProductID = '+@productID+';' 
@@ -158,19 +159,21 @@ BEGIN
 					--Cambiar el Stock del producto
 					EXEC sys.[sp_executesql] @SQL_UPDT2;
 
-					select N'Success' as res
+					SET @msg = 'Success'
+					print 'Success'
 				end
 			else
 				begin 
-					select N'NoProducts' as res --Si no hay productos en existencia
+					SET @msg = 'NoProducts' --Si no hay productos en existencia
 					print N'No hay productos en existencia'
 				end
 		end
 	else
 		begin
-			select N'NoOrder' as res--Si el producto no existe
+			SET @msg = 'NoOrder'
 			print N'El producto no se encuentra en la orden'
 		end
+		SELECT @msg
 COMMIT TRAN
 END
 

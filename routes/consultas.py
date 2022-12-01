@@ -118,24 +118,23 @@ def conse():
         opt_ord=request.form['Orden']
         opt_pro=request.form['Producto']
         opt_can=request.form['Cantidad']
-        respuesta = []
         if not(opt_can != '' and opt_ord != ''):
             flash('Formulario incompleto')
             return redirect(url_for('consultas.consulta_e'))
         conn = connection(inst)
         cursor = conn.cursor()
         cursor.execute("EXEC dbo.usp_ConsEUpdtSales ?,?,?,?,?",opt_can,opt_ord,opt_pro,instancias.get('sales'),instancias.get('production'))
-        for row in cursor.fetchall():
-            respuesta.append({"res": row[0]})
+        row=cursor.fetchone()
+        respuesta = row[0];
         conn.close()
         if respuesta == 'Success':
             flash('Valor Actualizado Correctamente.')
-            return redirect(url_for('consultas.consulta_e'))
+            return redirect(url_for('consultas.consulta_e',products=products))
         elif respuesta == 'NoProducts':
             flash('No hay Suficientes Productos en Existencia.')
-            return redirect(url_for('consultas.consulta_e'))
+            return redirect(url_for('consultas.consulta_e',products=products))
         elif respuesta == 'NoOrder':
             flash('El Producto No se Encuentra en la Orden.')
-            return redirect(url_for('consultas.consulta_e'))
+            return redirect(url_for('consultas.consulta_e',products=products))
 
         return render_template('consulta_a.html', products = products)
