@@ -114,7 +114,6 @@ def conse():
     global inst
     global instancias
     if request.method == 'POST':
-        products = complete_SelProd()
         opt_ord=request.form['Orden']
         opt_pro=request.form['Producto']
         opt_can=request.form['Cantidad']
@@ -126,9 +125,11 @@ def conse():
         cursor.execute("EXEC dbo.usp_ConsEUpdtSales ?,?,?,?,?",opt_can,opt_ord,opt_pro,instancias.get('sales'),instancias.get('production'))
         row=cursor.fetchone()
         respuesta = row[0];
+        conn.commit()
         conn.close()
+        print (opt_can+'  '+respuesta)
         if respuesta == 'Success':
-            flash('Valor Actualizado Correctamente.')
+            flash('Valor Actualizado Correctamente')
             return redirect(url_for('consultas.consulta_e'))
         elif respuesta == 'NoProducts':
             flash('No hay Suficientes Productos en Existencia.')

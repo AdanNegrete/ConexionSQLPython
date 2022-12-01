@@ -74,8 +74,7 @@ go
 /**********************************************************************************************/
 -- Consulta B
 ----Determinar producto mas solicitado
-CREATE PROCEDURE sp_productoSolicitado @p_group nvarchar(50)  
-AS
+CREATE OR ALTER PROCEDURE usp_ConsBPSol @p_group, @InstS varchar(max), @InstP varchar(max) nvarchar(50) AS  
 BEGIN 
 	'SELECT
 	TOP 1 SUM(T.lineTotal) as total_ventas,
@@ -161,6 +160,7 @@ CREATE OR ALTER PROCEDURE usp_ConsEUpdtSales (@cant varchar(max), @salesID varch
 BEGIN
 	BEGIN TRAN
 	SET NOCOUNT ON
+	--set xact_abort on
 	DECLARE @SQL_CONS1 nVARCHAR(MAX), @SQL_CONS2 nVARCHAR(MAX)
 	DECLARE @SQL_UPDT1 nVARCHAR(MAX), @SQL_UPDT2 nVARCHAR(MAX)
 	DECLARE @salida_c1 nvarchar(max), @salida_c2 nvarchar(max)
@@ -187,14 +187,19 @@ BEGIN
 			
 			if @salida_c2 is NOT NULL
 				begin
-					--actualizando venta
-					EXEC sys.[sp_executesql] @SQL_UPDT1;
+					begin try
+						--actualizando venta
+						EXEC sys.[sp_executesql] @SQL_UPDT1;
 
-					--Cambiar el Stock del producto
-					EXEC sys.[sp_executesql] @SQL_UPDT2;
+						--Cambiar el Stock del producto
+						EXEC sys.[sp_executesql] @SQL_UPDT2;
 
-					SET @msg = 'Success'
-					print 'Success'
+						SET @msg = 'Success'
+						print 'Success'
+					end try
+					begin catch 
+						SET @msg = 'Fallo en la actualización'
+					end catch
 				end
 			else
 				begin 
@@ -208,12 +213,14 @@ BEGIN
 			print N'El producto no se encuentra en la orden'
 		end
 		SELECT @msg
+		--set xact_abort off
 COMMIT TRAN
 END
 
 go
 ------------------------------------------------------------------------------------------------------
-exec usp_ConsEUpdtSales '5', '43659', '776', 'NEGA-PC', 'NEGA-PC'
+exec usp_ConsEUpdtSales '5', '45167', '750', 'NEGA-PC', 'NEGA-PC'
+select * from [NEGA-PC].AW_Equipo6.SALES.SalesOrderDetail;
 go
 /****************************************************************************/
 -------------------------------  CONSULTA F  -------------------------------
