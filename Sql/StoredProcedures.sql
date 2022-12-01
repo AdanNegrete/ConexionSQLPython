@@ -191,7 +191,7 @@ select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
 exec UpdateShip @method = 3,@salesID = 43659
 go
 /**********************************************************************************************/
--- Consulta H
+-- Consulta G
 --Actualizar el correo electronico de un id de entrada
 
 create procedure UpdateEmail (@customerID varchar (10), @newEmail varchar(50)) as
