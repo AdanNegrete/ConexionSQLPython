@@ -74,7 +74,7 @@ go
 /**********************************************************************************************/
 -- Consulta B
 ----Determinar producto mas solicitado
-CREATE PROCEDURE sp_productoSolicitado @p_group nvarchar(50)  
+CREATE OR ALTER PROCEDURE sp_productoSolicitado @p_group nvarchar(50)  
 AS
 BEGIN 
 	'SELECT
