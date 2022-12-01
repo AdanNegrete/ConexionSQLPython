@@ -118,6 +118,40 @@ END
 ------------------------------------------------------------------------------------------------------
 EXECUTE sp_productoSolicitado 'Pacific'
 
+/****************************************************************************/
+-------------------------------  CONSULTA C  -------------------------------
+--Actualizar el stock disponible en un 5%de los productos de la categoría 
+--que se provea como argumento de entrada
+/****************************************************************************/
+
+create or alter procedure cc_updateLocation (@localidad int, @cat int) as
+begin
+	if exists(select *
+		from AdventureWorks2017.Production.ProductInventory as pii
+		where pii.LocationID = @localidad and
+		ProductID in (
+			select ProductID
+			from AdventureWorks2017.Production.ProductSubcategory
+			where ProductCategoryID = @cat
+		)) 
+		begin
+			update AdventureWorks2017.Production.ProductInventory
+			set Quantity = Quantity + ROUND((Quantity * 0.05), 0)
+			from AdventureWorks2017.Production.ProductInventory as pii
+			where pii.LocationID = @localidad and
+			ProductID in (
+				select ProductID
+				from AdventureWorks2017.Production.ProductSubcategory
+				where ProductCategoryID = @cat
+			)
+		end
+	else
+		begin
+			SELECT NULL
+		end
+end
+
+exec cc_updateLocation @localidad = 60, @cat = 1
 
 /**********************************************************************************************/
 -- Consulta E
