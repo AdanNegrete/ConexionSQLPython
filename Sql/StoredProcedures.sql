@@ -156,9 +156,13 @@ BEGIN  TRAN
 		end'
 
 
-exec sys.[cc_updateStock] @SQLc
+exec sys.[sp_executesql] @SQLc
 COMMIT TRAN
 end
+/**********************************************************************************************/
+EXEC cc_updateStock '60', '1'
+go
+
 /**********************************************************************************************/
 -- Consulta E
 -- Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
