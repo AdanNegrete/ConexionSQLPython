@@ -230,22 +230,26 @@ go
 --Actualizar el método de envío de una orden que se reciba como argumento 
 --en la instrucción de actualización
 /****************************************************************************/
-create procedure UpdateShip (@method int, @salesID int) as
+create or alter procedure UpdateShip (@method varchar(20), @salesID varchar(20)) as
 begin
-	if exists(select * from AdventureWorks2019.Purchasing.ShipMethod
-		where ShipMethodID = @method)
+begin tran
+declare @sqlf nvarchar(max)
+set @sqlf =
+	'if exists(select * from ['+@InstS+'].AW_Equipo6.Purchasing.ShipMethod
+		where ShipMethodID = '+@method+')
 		begin
-			--Actualizar metodo de envio
-			update AdventureWorks2019.Sales.SalesOrderHeader
-			set ShipMethodID = @method
-			where SalesOrderID = @salesID
+			update ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader
+			set ShipMethodID = '+@method+'
+			where SalesOrderID = '+@salesID+'
 		end
 	else
 		begin
 			select null --En caso de que no exista
-		end
+		end'
+EXEC sys.[sp_executesql] @SQL
+commit tran
 end
-go	
+go
 ------------------------------------------------------------------------------------------------------
 select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
 exec UpdateShip @method = 3,@salesID = 43659
