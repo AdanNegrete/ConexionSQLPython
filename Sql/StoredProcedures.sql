@@ -74,7 +74,8 @@ go
 /**********************************************************************************************/
 -- Consulta B
 ----Determinar producto mas solicitado
-CREATE OR ALTER PROCEDURE usp_ConsBPSol @p_group, @InstS varchar(max), @InstP varchar(max) nvarchar(50) AS  
+CREATE PROCEDURE sp_productoSolicitado @p_group nvarchar(50)  
+AS
 BEGIN 
 	'SELECT
 	TOP 1 SUM(T.lineTotal) as total_ventas,
@@ -123,34 +124,44 @@ EXECUTE sp_productoSolicitado 'Pacific'
 --que se provea como argumento de entrada
 /****************************************************************************/
 
-create or alter procedure cc_updateLocation (@localidad int, @cat int) as
+GO
+create or alter procedure cc_updateStock (@localidad varchar(10), @cat varchar(10),@InstP varchar(max)) as
 begin
-	if exists(select *
-		from AdventureWorks2017.Production.ProductInventory as pii
+BEGIN  TRAN
+	DECLARE @SQLc nvarchar(max)
+	SET @SQLc=
+	
+	'if exists(select *
+		from ['+@InstP+'].AW_Equipo6.Production.ProductInventory as pii
 		where pii.LocationID = @localidad and
 		ProductID in (
 			select ProductID
-			from AdventureWorks2017.Production.ProductSubcategory
+			from ['+@InstP+'].AW_Equipo6.Production.ProductSubcategory
 			where ProductCategoryID = @cat
 		)) 
 		begin
-			update AdventureWorks2017.Production.ProductInventory
+			update ['+@InstP+'].AW_Equipo6.Production.ProductInventory
 			set Quantity = Quantity + ROUND((Quantity * 0.05), 0)
-			from AdventureWorks2017.Production.ProductInventory as pii
+			from ['+@InstP+'].AW_Equipo6.Production.ProductInventory as pii
 			where pii.LocationID = @localidad and
 			ProductID in (
 				select ProductID
-				from AdventureWorks2017.Production.ProductSubcategory
+				from ['+@InstP+'].AW_Equipo6.Production.ProductSubcategory
 				where ProductCategoryID = @cat
 			)
 		end
 	else
 		begin
 			SELECT NULL
-		end
-end
+		end'
 
-exec cc_updateLocation @localidad = 60, @cat = 1
+
+exec sys.[sp_executesql] @SQLc
+COMMIT TRAN
+end
+/**********************************************************************************************/
+EXEC cc_updateStock '60', '1'
+go
 
 /**********************************************************************************************/
 -- Consulta E
@@ -227,22 +238,26 @@ go
 --Actualizar el método de envío de una orden que se reciba como argumento 
 --en la instrucción de actualización
 /****************************************************************************/
-create procedure UpdateShip (@method int, @salesID int) as
+create or alter procedure UpdateShip (@method varchar(20), @salesID varchar(20)) as
 begin
-	if exists(select * from AdventureWorks2019.Purchasing.ShipMethod
-		where ShipMethodID = @method)
+begin tran
+declare @sqlf nvarchar(max)
+set @sqlf =
+	'if exists(select * from ['+@InstS+'].AW_Equipo6.Purchasing.ShipMethod
+		where ShipMethodID = '+@method+')
 		begin
-			--Actualizar metodo de envio
-			update AdventureWorks2019.Sales.SalesOrderHeader
-			set ShipMethodID = @method
-			where SalesOrderID = @salesID
+			update ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader
+			set ShipMethodID = '+@method+'
+			where SalesOrderID = '+@salesID+'
 		end
 	else
 		begin
 			select null --En caso de que no exista
-		end
+		end'
+EXEC sys.[sp_executesql] @SQL
+commit tran
 end
-go	
+go
 ------------------------------------------------------------------------------------------------------
 select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
 exec UpdateShip @method = 3,@salesID = 43659
@@ -277,13 +292,18 @@ exec UpdateEmail @customerID = 11000, @newemail = 'ejemplo@mail.com'
 -------------------------------  CONSULTA H  -------------------------------
 --Determinar el empleado que atendió más ordenes por territorio/región
 /****************************************************************************/
-create procedure MejorEmpleado (@territory varchar(3)) as
+create or alter procedure MejorEmpleado (@territory varchar(3)) as
 	begin
-		select top 1 SalesPersonID, count(SalesPersonID) NumPedidos, TerritoryID 
-		from AdventureWorks2019.Sales.SalesOrderHeader
-		where TerritoryID = @territory
-		group by SalesPersonID,TerritoryID
-		order by NumPedidos desc
+		begin tran
+		declare @sql nvarchar(max)
+		set @sql =
+			'select top 1 SalesPersonID, count(SalesPersonID) NumPedidos, TerritoryID 
+			from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader
+			where TerritoryID = '+@territory+'
+			group by SalesPersonID,TerritoryID
+			order by NumPedidos desc'
+		EXEC sys.[sp_executesql] @SQL
+		commit tran
 	end
 go
 ------------------------------------------------------------------------------
@@ -294,21 +314,30 @@ execute MejorEmpleado @territory= 5
 --Determinar paraun rango de fechas establecidas como argumento de entrada, 
 --cual es el total de las ventasen cada una de las regiones
 /****************************************************************************/
-create procedure Grupos_I (@f1 date, @f2 date) as
+Create or Alter procedure Grupos_I (@f1 date, @f2 date, @InstS varchar(max) ) as
 	begin
-		select t.[Group], sum(sod.LineTotal) as VentasTotales
-		from AdventureWorks2019.sales.SalesOrderHeader soh
-		inner join AdventureWorks2019.sales.SalesOrderDetail sod
-		on soh.SalesOrderID = sod.SalesOrderID
-		inner join AdventureWorks2019.sales.SalesTerritory t
-		on soh.TerritoryID = t.TerritoryID
-		where OrderDate between @f1 AND @f2
-		group by t.[Group]
+		BEGIN TRAN
+		DECLARE @SQLi nvarchar(max)
+		SET @SQLi =
+		'select t.[Group], sum(sod.LineTotal) as VentasTotales
+			from ['+@InstS+'].AW_Equipo6.sales.SalesOrderHeader soh
+			inner join ['+@InstS+'].AW_Equipo6.sales.SalesOrderDetail sod
+			on soh.SalesOrderID = sod.SalesOrderID
+			inner join ['+@InstS+'].AW_Equipo6.sales.SalesTerritory t
+			on soh.TerritoryID = t.TerritoryID
+			where OrderDate between '+@f1+' AND '+@f2+'
+			group by t.[Group]
+		'
+		
+		EXEC sys.[sp.executesql] @SQLi
+		COMMIT TRAN
 	end
-go
-------------------------------------------------------------------------------
-execute Grupos_I @f1 = '2011-06-01', @f2 = '2011-12-31'
 
+go
+
+------------------------------------------------------------------------------
+
+execute Grupos_I '2011-06-01', '2011-12-31', 'NEGA-PC'
 /****************************************************************************/
 -------------------------------  CONSULTA J  -------------------------------
 --Determinar los5 productos menos vendidos en un rango de fecha 
