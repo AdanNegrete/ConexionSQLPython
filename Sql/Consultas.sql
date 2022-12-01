@@ -158,14 +158,55 @@ go
 --G
 
 
-/**********************************************************************************************/
---H
+/****************************************************************************/
+-------------------------------  CONSULTA H  -------------------------------
+/****************************************************************************/
+create procedure MejorEmpleado (@territory varchar(3)) as
+	begin
+		select top 1 SalesPersonID, count(SalesPersonID) NumPedidos, TerritoryID 
+		from AdventureWorks2019.Sales.SalesOrderHeader
+		where TerritoryID = @territory
+		group by SalesPersonID,TerritoryID
+		order by NumPedidos desc
+	end
+go
+------------------------------------------------------------------------------
+execute MejorEmpleado @territory= 5
 
+/****************************************************************************/
+-------------------------------  CONSULTA I  -------------------------------
+/****************************************************************************/
+create procedure GruposI (@f1 varchar(50), @f2 varchar(50)) as
+	begin
+		select t.[Group], sum(sod.LineTotal) as VentasTotales
+		from AdventureWorks2019.sales.SalesOrderHeader soh
+		inner join AdventureWorks2019.sales.SalesOrderDetail sod
+		on soh.SalesOrderID = sod.SalesOrderID
+		inner join AdventureWorks2019.sales.SalesTerritory t
+		on soh.TerritoryID = t.TerritoryID
+		where OrderDate between @f1 AND @f2
+		group by t.[Group]
+	end
+go
+------------------------------------------------------------------------------
+execute GruposI @f1 = '2011-06-01', @f2 = '2011-12-31'
 
-/**********************************************************************************************/
---I
-
-
-/**********************************************************************************************/
---J
+/****************************************************************************/
+-------------------------------  CONSULTA J  -------------------------------
+/****************************************************************************/
+create procedure PeoresVentas (@f1 date, @f2 date) as
+begin
+	set nocount on;
+	select top 5 sod.ProductID, sum(sod.LineTotal) Ventas
+	from AdventureWorks2019.Sales.SalesOrderHeader soh
+inner join AdventureWorks2019.Sales.SalesOrderDetail sod
+	on soh.SalesOrderID = sod.SalesOrderID
+	where OrderDate BETWEEN @f1 AND @f2
+	group by sod.ProductID
+	order by ventas desc
+end
+go
+------------------------------------------------------------------------------
+exec JFechas'2011-05-01','2011-05-31';
+go
 
