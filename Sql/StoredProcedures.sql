@@ -19,13 +19,13 @@ BEGIN TRAN
 COMMIT TRAN
 END
 
---Procedimiento de listado de las categorias
+--Procedimiento de listado de los productos
 GO
 CREATE OR ALTER PROCEDURE usp_ProductList @Inst varchar(max) AS
 BEGIN
 BEGIN TRAN
 	DECLARE @SQL nvarchar(MAX)
-	SET @SQL = 'SELECT productcategoryid as id, [name] as name FROM ['+@Inst+'].AW_Equipo6.Production.ProductCategory Order By id;'
+	SET @SQL = 'SELECT productid as id, [name] as name FROM ['+@Inst+'].AW_Equipo6.Production.Product Order By id;'
     EXEC sys.[sp_executesql] @SQL
 COMMIT TRAN
 END
@@ -157,21 +157,22 @@ BEGIN
 
 					--Cambiar el Stock del producto
 					EXEC sys.[sp_executesql] @SQL_UPDT2;
+
+					select N'Success' as res
 				end
 			else
 				begin 
-					select null --Si no hay productos en existencia
+					select N'NoProducts' as res --Si no hay productos en existencia
 					print N'No hay productos en existencia'
 				end
 		end
 	else
 		begin
-			select null, @salida_c1, @salesID --Si el producto no existe
+			select N'NoOrder' as res--Si el producto no existe
 			print N'El producto no se encuentra en la orden'
 		end
 COMMIT TRAN
 END
-
 
 go
 ------------------------------------------------------------------------------------------------------

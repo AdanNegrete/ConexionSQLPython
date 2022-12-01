@@ -1,5 +1,16 @@
 {% include 'header.html' %}
-<form id="formulario" method="post" action="/consatrr">
+
+{% with messages= get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+            {{message}}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+<form id="formulario" method="post" action="/conse">
 
     <div class="card">
         <div class="card-header">
@@ -12,26 +23,27 @@
                 <br>Posteriormente ingrese la cantidad a añadir de piezas de ese producto.
                 <br/>
                 <div class="form-group">
-                    <label for="Orden">Seleccione la Orden: </label>
-                    <select id="Orden" name="Orden">
-                        {% for order in orders %}
-                            <option  value={{order.id}}>{{order.id}}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="Orden">Ingresa el número de Orden </label>
+                    <input id="Orden" class="form-control" type="text" name="Orden">
                 </div>
                 <br/>
                 <div class="form-group">
                     <label for="Producto">Seleccione el Producto: </label>
                     <select id="Producto" name="Producto">
                         {% for product in products %}
-                            <option  value={{product.id}}>{{product.name}}</option>
+                            <option  value={{product.id}}>{{product.id}}:{{product.name}}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <br>
                 <div class="form-group">
+                    <label for="Cantidad">Ingresa la cantidad</label>
+                    <input id="Cantidad" class="form-control" type="text" name="Cantidad">
+                </div>
+                <br>
+                <div class="form-group">
                     <button type="submit" class="btn btn-success" id="btn-cons">
-                        Buscar
+                        Actualizar
                     </button>
                 </div>
 
@@ -40,23 +52,4 @@
     </div>
 
 </form>
-<script></script>
-<div id="tabla_a">
-    <table class="table">
-        <thead>
-            <tr>
-            <th scope="col">Territorio</th>
-            <th scope="col">Ventas Totales</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for venta in ventas %}
-                <tr>
-                    <td>{{ venta.TerrName }}</th>
-                    <td>{{ venta.VentasTotales }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 {% include 'footer.html' %}

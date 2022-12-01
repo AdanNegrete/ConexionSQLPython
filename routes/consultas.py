@@ -25,6 +25,19 @@ def complete_SelCat():
     conn.close()
     return categories
 
+def complete_SelProd():
+    global instancias
+    global inst
+    products = []
+    conn = connection(inst)
+    cursor = conn.cursor()
+    cursor.execute("EXEC dbo.usp_ProductList ?",instancias.get('production'))
+    print(cursor)
+    for row in cursor.fetchall():
+        products.append({"id": row[0], "name": row[1]})
+    conn.close()
+    return products
+
 @consultas.route("/") #For default route
 def Index():
     return render_template("index.html")
@@ -93,4 +106,36 @@ def consulta_b():
 # Consulta E
 @consultas.route("/consulta_e")
 def consulta_e():
-    return "Consulta B"
+    products = complete_SelProd()
+    return render_template('consulta_e.html', products = products)
+
+@consultas.route("/conse", methods=['POST'])
+def conse():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        products = complete_SelProd()
+        opt_ord=request.form['Orden']
+        opt_pro=request.form['Producto']
+        opt_can=request.form['Cantidad']
+        respuesta = []
+        if not(opt_can != '' and opt_ord != ''):
+            flash('Formulario incompleto')
+            return redirect(url_for('consultas.consulta_e'))
+        conn = connection(inst)
+        cursor = conn.cursor()
+        cursor.execute("EXEC dbo.usp_ConsEUpdtSales ?,?,?,?,?",opt_can,opt_ord,opt_pro,instancias.get('sales'),instancias.get('production'))
+        for row in cursor.fetchall():
+            respuesta.append({"res": row[0]})
+        conn.close()
+        if respuesta == 'Success':
+            flash('Valor Actualizado Correctamente.')
+            return redirect(url_for('consultas.consulta_e'))
+        elif respuesta == 'NoProducts':
+            flash('No hay Suficientes Productos en Existencia.')
+            return redirect(url_for('consultas.consulta_e'))
+        elif respuesta == 'NoOrder':
+            flash('El Producto No se Encuentra en la Orden.')
+            return redirect(url_for('consultas.consulta_e'))
+
+        return render_template('consulta_a.html', products = products)
