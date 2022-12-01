@@ -129,12 +129,10 @@ def conse():
         conn.close()
         if respuesta == 'Success':
             flash('Valor Actualizado Correctamente.')
-            return redirect(url_for('consultas.consulta_e',products=products))
+            return redirect(url_for('consultas.consulta_e'))
         elif respuesta == 'NoProducts':
             flash('No hay Suficientes Productos en Existencia.')
-            return redirect(url_for('consultas.consulta_e',products=products))
+            return redirect(url_for('consultas.consulta_e'))
         elif respuesta == 'NoOrder':
             flash('El Producto No se Encuentra en la Orden.')
-            return redirect(url_for('consultas.consulta_e',products=products))
-
-        return render_template('consulta_a.html', products = products)
+            return redirect(url_for('consultas.consulta_e'))
