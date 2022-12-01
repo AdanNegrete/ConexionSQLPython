@@ -276,13 +276,18 @@ exec UpdateEmail @customerID = 11000, @newemail = 'ejemplo@mail.com'
 -------------------------------  CONSULTA H  -------------------------------
 --Determinar el empleado que atendió más ordenes por territorio/región
 /****************************************************************************/
-create procedure MejorEmpleado (@territory varchar(3)) as
+create or alter procedure MejorEmpleado (@territory varchar(3)) as
 	begin
-		select top 1 SalesPersonID, count(SalesPersonID) NumPedidos, TerritoryID 
-		from AdventureWorks2019.Sales.SalesOrderHeader
-		where TerritoryID = @territory
-		group by SalesPersonID,TerritoryID
-		order by NumPedidos desc
+		begin tran
+		declare @sql nvarchar(max)
+		set @sql =
+			'select top 1 SalesPersonID, count(SalesPersonID) NumPedidos, TerritoryID 
+			from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader
+			where TerritoryID = '+@territory+'
+			group by SalesPersonID,TerritoryID
+			order by NumPedidos desc'
+		EXEC sys.[sp_executesql] @SQL
+		commit tran
 	end
 go
 ------------------------------------------------------------------------------
