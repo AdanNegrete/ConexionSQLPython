@@ -125,7 +125,7 @@ EXECUTE sp_productoSolicitado 'Pacific'
 /****************************************************************************/
 
 GO
-create or alter procedure cc_updateStock (@localidad varchar(10), @cat varchar(10)) as
+create or alter procedure cc_updateStock (@localidad varchar(10), @cat varchar(10),@InstP varchar(max)) as
 begin
 BEGIN  TRAN
 	DECLARE @SQLc nvarchar(max)
@@ -306,21 +306,30 @@ execute MejorEmpleado @territory= 5
 --Determinar paraun rango de fechas establecidas como argumento de entrada, 
 --cual es el total de las ventasen cada una de las regiones
 /****************************************************************************/
-create procedure Grupos_I (@f1 date, @f2 date) as
+Create or Alter procedure Grupos_I (@f1 date, @f2 date, @InstS varchar(max) ) as
 	begin
-		select t.[Group], sum(sod.LineTotal) as VentasTotales
-		from AdventureWorks2019.sales.SalesOrderHeader soh
-		inner join AdventureWorks2019.sales.SalesOrderDetail sod
-		on soh.SalesOrderID = sod.SalesOrderID
-		inner join AdventureWorks2019.sales.SalesTerritory t
-		on soh.TerritoryID = t.TerritoryID
-		where OrderDate between @f1 AND @f2
-		group by t.[Group]
+		BEGIN TRAN
+		DECLARE @SQLi nvarchar(max)
+		SET @SQLi =
+		'select t.[Group], sum(sod.LineTotal) as VentasTotales
+			from ['+@InstS+'].AW_Equipo6.sales.SalesOrderHeader soh
+			inner join ['+@InstS+'].AW_Equipo6.sales.SalesOrderDetail sod
+			on soh.SalesOrderID = sod.SalesOrderID
+			inner join ['+@InstS+'].AW_Equipo6.sales.SalesTerritory t
+			on soh.TerritoryID = t.TerritoryID
+			where OrderDate between '+@f1+' AND '+@f2+'
+			group by t.[Group]
+		'
+		
+		EXEC sys.[sp.executesql] @SQLi
+		COMMIT TRAN
 	end
-go
-------------------------------------------------------------------------------
-execute Grupos_I @f1 = '2011-06-01', @f2 = '2011-12-31'
 
+go
+
+------------------------------------------------------------------------------
+
+execute Grupos_I '2011-06-01', '2011-12-31', 'NEGA-PC'
 /****************************************************************************/
 -------------------------------  CONSULTA J  -------------------------------
 --Determinar los5 productos menos vendidos en un rango de fecha 
