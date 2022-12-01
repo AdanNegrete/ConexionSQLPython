@@ -60,6 +60,7 @@ def consulta():
     conn.close()
     return render_template("resultlist.html", products = products)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta A
 @consultas.route("/consulta_a")
 def consulta_a():
     categories = complete_SelCat()
@@ -87,4 +88,9 @@ def consatrr():
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @consultas.route("/consulta_b")
 def consulta_b():
+    return "Consulta B"
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta E
+@consultas.route("/consulta_e")
+def consulta_e():
     return "Consulta B"

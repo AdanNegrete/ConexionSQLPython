@@ -1,0 +1,62 @@
+{% include 'header.html' %}
+<form id="formulario" method="post" action="/consatrr">
+
+    <div class="card">
+        <div class="card-header">
+            Consulta E
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Actualizar en Orden</h5>
+            <p class="card-text">
+                Seleccione la orden a la cual hará la modificación y el producto de la misma.
+                <br>Posteriormente ingrese la cantidad a añadir de piezas de ese producto.
+                <br/>
+                <div class="form-group">
+                    <label for="Orden">Seleccione la Orden: </label>
+                    <select id="Orden" name="Orden">
+                        {% for order in orders %}
+                            <option  value={{order.id}}>{{order.id}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <label for="Producto">Seleccione el Producto: </label>
+                    <select id="Producto" name="Producto">
+                        {% for product in products %}
+                            <option  value={{product.id}}>{{product.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
+                        Buscar
+                    </button>
+                </div>
+
+            </p>
+        </div>
+    </div>
+
+</form>
+<script></script>
+<div id="tabla_a">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Territorio</th>
+            <th scope="col">Ventas Totales</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+                <tr>
+                    <td>{{ venta.TerrName }}</th>
+                    <td>{{ venta.VentasTotales }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'footer.html' %}

@@ -19,6 +19,17 @@ BEGIN TRAN
 COMMIT TRAN
 END
 
+--Procedimiento de listado de las categorias
+GO
+CREATE OR ALTER PROCEDURE usp_ProductList @Inst varchar(max) AS
+BEGIN
+BEGIN TRAN
+	DECLARE @SQL nvarchar(MAX)
+	SET @SQL = 'SELECT productcategoryid as id, [name] as name FROM ['+@Inst+'].AW_Equipo6.Production.ProductCategory Order By id;'
+    EXEC sys.[sp_executesql] @SQL
+COMMIT TRAN
+END
+
 /**********************************************************************************************/
 -- Consulta A
 -- Procedimiento de busqueda de ventas totales por territorio
