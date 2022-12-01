@@ -35,8 +35,11 @@ on soh.TerritoryID = t.TerritoryID
 group by t.[Group], sod.ProductID
 having count(sod.ProductID) = (select max(col) from ())
 
-/**********************************************************************************************/
---A
+/****************************************************************************/
+-------------------------------  CONSULTA A  -------------------------------
+--Determinar el total de las ventas de los productos de la categoría que se provea 
+--como argumento de entrada en la consulta,para cada uno de los territorios
+/****************************************************************************/
 
 select soh.TerritoryID, sum(a.LineTotal) as total_venta
 from AdventureWorks2019.sales.SalesOrderHeader soh
@@ -64,11 +67,17 @@ group by soh.TerritoryID
 order by soh.TerritoryID
 go
 
-/**********************************************************************************************/
---B
+/****************************************************************************/
+-------------------------------  CONSULTA B  -------------------------------
+--Determinar el producto más solicitado para la región que  
+--se especifique  como argumento
+/****************************************************************************/
 
-/**********************************************************************************************/
---C
+/****************************************************************************/
+-------------------------------  CONSULTA C  -------------------------------
+--Actualizar el stock disponible en un 5%de los productos de la categoría 
+--que se provea como argumento de entrada
+/****************************************************************************/
 
 create or alter procedure cc_updateLocation (@localidad int, @cat int) as
 begin
@@ -99,8 +108,11 @@ end
 
 exec cc_updateLocation @localidad = 60, @cat = 1
 
-/**********************************************************************************************/
---D
+/****************************************************************************/
+-------------------------------  CONSULTA D  -------------------------------
+--Determinar si hay clientes de un territorio que se especifique 
+--como argumento de entrada
+/****************************************************************************/
 
 select t.[group], sod.ProductID, count(ProductId) as col
 from AdventureWorks2019.sales.SalesOrderDetail sod
@@ -109,8 +121,12 @@ on sod.SalesOrderID = soh.SalesOrderID
 inner join AdventureWorks2019.sales.SalesTerritory t
 on soh.TerritoryID = t.TerritoryID
 group by t.[Group], sod.ProductID
-/**********************************************************************************************/
---E
+
+/****************************************************************************/
+-------------------------------  CONSULTA E  -------------------------------
+--Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea 
+--como argumento en la instrucción de actualización
+/****************************************************************************/
 create procedure EUpdateSales (@cant int, @salesID int, @productID int) as
 begin
 
@@ -150,16 +166,60 @@ go
 exec EUpdateSales @cant = 1, @salesID = 43659, @productID  = 776
 go
 
-/**********************************************************************************************/
---F
+/****************************************************************************/
+-------------------------------  CONSULTA F  -------------------------------
+--Actualizar el método de envío de una orden que se reciba como argumento 
+--en la instrucción de actualización
+/****************************************************************************/
+create procedure UpdateShip (@method int, @salesID int) as
+begin
+	if exists(select * from AdventureWorks2019.Purchasing.ShipMethod
+		where ShipMethodID = @method)
+		begin
+			--Actualizar metodo de envio
+			update AdventureWorks2019.Sales.SalesOrderHeader
+			set ShipMethodID = @method
+			where SalesOrderID = @salesID
+		end
+	else
+		begin
+			select null --En caso de que no exista
+		end
+end
+go	
+------------------------------------------------------------------------------------------------------
+select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
+exec UpdateShip @method = 3,@salesID = 43659
+go
 
+/****************************************************************************/
+-------------------------------  CONSULTA G  -------------------------------
+--Actualizar el correo electrónico de una cliente que se reciba como argumento 
+--en la instrucción de actualización
+/****************************************************************************/
+create procedure UpdateEmail (@customerID varchar (10), @newEmail varchar(50)) as
+begin
+	if exists(select * from AdventureWorks2019.Sales.Customer
+	where CustomerID = @customerID and PersonID is not null)
+		begin
+			update AdventureWorks2019.Person.EmailAddress	
+			set EmailAddress = @newEmail
+			where BusinessEntityID = (
+				select PersonID from AdventureWorks2019.Sales.Customer
+				where CustomerID = @customerID)
+		end
+	else
+		begin
+			select null
+		end
+end
+go
 
-/**********************************************************************************************/
---G
-
+exec UpdateEmail @customerID = 11000, @newemail = 'asasasasasa'
 
 /****************************************************************************/
 -------------------------------  CONSULTA H  -------------------------------
+--Determinar el empleado que atendió más ordenes por territorio/región
 /****************************************************************************/
 create procedure MejorEmpleado (@territory varchar(3)) as
 	begin
@@ -175,6 +235,8 @@ execute MejorEmpleado @territory= 5
 
 /****************************************************************************/
 -------------------------------  CONSULTA I  -------------------------------
+--Determinar paraun rango de fechas establecidas como argumento de entrada, 
+--cual es el total de las ventasen cada una de las regiones
 /****************************************************************************/
 create procedure GruposI (@f1 varchar(50), @f2 varchar(50)) as
 	begin
@@ -193,6 +255,8 @@ execute GruposI @f1 = '2011-06-01', @f2 = '2011-12-31'
 
 /****************************************************************************/
 -------------------------------  CONSULTA J  -------------------------------
+--Determinar los5 productos menos vendidos en un rango de fecha 
+--establecido como argumento de entrada
 /****************************************************************************/
 create procedure PeoresVentas (@f1 date, @f2 date) as
 begin
