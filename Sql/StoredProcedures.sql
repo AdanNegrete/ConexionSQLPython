@@ -126,7 +126,7 @@ GO
 CREATE OR ALTER PROCEDURE usp_ConsEUpdtSales (@cant varchar(max), @salesID varchar(20), @productID varchar(20), @InstS varchar(max), @InstP varchar(max)) AS
 BEGIN
 	BEGIN TRAN
-	
+	SET NOCOUNT ON
 	DECLARE @SQL_CONS1 nVARCHAR(MAX), @SQL_CONS2 nVARCHAR(MAX)
 	DECLARE @SQL_UPDT1 nVARCHAR(MAX), @SQL_UPDT2 nVARCHAR(MAX)
 	DECLARE @salida_c1 nvarchar(max), @salida_c2 nvarchar(max)
