@@ -1,0 +1,55 @@
+{% include 'header.html' %}
+<form id="formulario" method="post" action="/consb">
+
+    <div class="card">
+        <div class="card-header">
+            Consulta B
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Producto más Vendido</h5>
+            <p class="card-text">
+                
+                <div class="form-group">
+                    <label for="Region">Seleccione la Región: </label>
+                    <select id="Region" name="Region">
+                        {% for region in regions %}
+                            <option  value={{region.group}}>{{region.group}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
+                        Buscar
+                    </button>
+                </div>
+
+            </p>
+        </div>
+    </div>
+
+</form>
+<script></script>
+<div id="tabla_b">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Producto</th>
+            <th scope="col">Ventas Totales</th>
+            <th scope="col">Región</th>
+            <th scope="col">Territorio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.Name }}</th>
+                    <td>{{ producto.TVentas }}</td>
+                    <td>{{ producto.Region }}</td>
+                    <td>{{ producto.Territory }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'footer.html' %}

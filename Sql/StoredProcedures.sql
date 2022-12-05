@@ -30,6 +30,17 @@ BEGIN TRAN
 COMMIT TRAN
 END
 
+--Procedimiento de listado de las Regiones (SalesTerritory)
+GO
+CREATE OR ALTER PROCEDURE usp_RegionList @Inst varchar(max) AS
+BEGIN
+BEGIN TRAN
+	DECLARE @SQL nvarchar(MAX)
+	SET @SQL = 'SELECT [Group] FROM ['+@Inst+'].AW_Equipo6.Sales.SalesTerritory Group By [Group];'
+    EXEC sys.[sp_executesql] @SQL
+COMMIT TRAN
+END
+EXEC usp_RegionList 'SALESEX'
 /**********************************************************************************************/
 -- Consulta A
 -- Procedimiento de busqueda de ventas totales por territorio
@@ -74,50 +85,63 @@ go
 /**********************************************************************************************/
 -- Consulta B
 ----Determinar producto mas solicitado
-CREATE PROCEDURE sp_productoSolicitado @p_group nvarchar(50)  
-AS
-BEGIN 
-	'SELECT
-	TOP 1 SUM(T.lineTotal) as total_ventas,
-	p.Name as Nombre,
-	p.ProductID
-FROM
-	['+@InstP+'].AW_Equipo6.Production.Product p
-inner join(
-	SELECT
-		ProductID,
-		lineTotal
-	FROM
-		['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail sod
-	WHERE
-		SalesOrderID in(
-		SELECT
-			SalesOrderID
-		FROM
-			['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader soh
-		WHERE
-			TerritoryID in(
-			SELECT
-				TerritoryID
-			FROM
-				['+@InstS+'].AW_Equipo6.Sales.SalesTerritory st
-			WHERE
-				[Group] = @p_group
-			)
-		)
-	) as T
-	on
-	p.ProductID = T.ProductID
-GROUP BY
-	p.Name,
-	p.ProductID
-ORDER by
-	total_ventas DESC
-	'
+GO
+CREATE OR ALTER PROCEDURE usp_ConsBProdSol @p_group varchar(50), @InstS varchar(max), @InstP varchar(max) AS
+BEGIN
+	BEGIN TRAN
+	DECLARE @SQL nvarchar(max)
+	IF @p_group = 'North'
+		SET @p_group = 'North America'
+	SET @SQL =
+		'SELECT TOP 1 SUM(Terr.lineTotal) as TVentas, Prod.Name as Producto, Prod.ProductID as Id
+		FROM ['+@InstP+'].AW_Equipo6.Production.Product Prod
+		inner join
+		(SELECT	ProductID, lineTotal 
+			FROM ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail sod
+			WHERE SalesOrderID in
+				(SELECT	SalesOrderID FROM ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader soh
+				WHERE TerritoryID in
+					(SELECT	TerritoryID	FROM ['+@InstS+'].AW_Equipo6.Sales.SalesTerritory st
+					WHERE [Group] = '''+@p_group+'''))) as Terr
+		ON Prod.ProductID = Terr.ProductID
+		GROUP BY Prod.Name,	Prod.ProductID
+		ORDER by TVentas DESC'
+	EXEC sys.[sp_executesql] @SQL
+	COMMIT TRAN
+END 
+
+-- Se realizó un procedimiento adicional en esta consulta para obtener el territorio con más demanda
+GO
+CREATE OR ALTER PROCEDURE usp_ConsBTerr @p_group varchar(50),@id_prod varchar(20), @InstS varchar(max) AS
+BEGIN
+	BEGIN TRAN
+	DECLARE @SQL nvarchar(max)
+	IF @p_group = 'North'
+		SET @p_group = 'North America'
+	SET @SQL =
+		'SELECT st.[name] as Territory FROM ['+@InstS+'].AW_Equipo6.SALES.SalesTerritory as st
+		INNER JOIN
+			(SELECT TOP 1 sum(a.linetotal) as TVentas,sh.territoryid
+			FROM ['+@InstS+'].AW_Equipo6.SALES.SalesOrderHeader sh 
+			Inner join
+				(SELECT salesorderid, linetotal 
+				FROM ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail sod
+				WHERE SalesOrderID in
+					(SELECT	SalesOrderID FROM ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader soh
+					WHERE TerritoryID in
+						(SELECT	TerritoryID	FROM ['+@InstS+'].AW_Equipo6.Sales.SalesTerritory
+						WHERE [Group] = '''+ @p_group +''')) 
+				AND productid = '+@id_prod+') as A
+			on a.salesorderid=sh.Salesorderid
+			GROUP BY sh.territoryid
+			ORDER BY TVentas DESC) AS T
+		ON st.territoryid=T.territoryid'
+	EXEC sys.[sp_executesql] @SQL
+	COMMIT TRAN
 END 
 ------------------------------------------------------------------------------------------------------
-EXECUTE sp_productoSolicitado 'Pacific'
-
+EXECUTE usp_ConsBProdSol 'North America', 'SALESEX', 'PRODUCTIONEX'
+EXECUTE usp_ConsBTerr 'North America','782', 'SALESEX'
 /****************************************************************************/
 -------------------------------  CONSULTA C  -------------------------------
 --Actualizar el stock disponible en un 5%de los productos de la categoría 

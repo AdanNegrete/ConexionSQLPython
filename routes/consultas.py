@@ -4,7 +4,7 @@ from utils.db_con import connection
 consultas = Blueprint('consultas',__name__)
 consultas.secret_key="ScrtKy"
 
-# Variables Globales
+# ~~~~~~~~~~~~~~~~ Variables Globales ~~~~~~~~~~~~~~~~
 inst=''
 instancias={
     'sales': 'NEGA-PC',
@@ -12,6 +12,7 @@ instancias={
     'other': 'NEGA-PC'
 }
 
+# ~~~~~~~~~~~~~~~~ Métodos Auxiliares (Listas) ~~~~~~~~~~~~~~~~
 def complete_SelCat():
     global instancias
     global inst
@@ -37,6 +38,21 @@ def complete_SelProd():
         products.append({"id": row[0], "name": row[1]})
     conn.close()
     return products
+
+def complete_SelReg():
+    global instancias
+    global inst
+    regions = []
+    conn = connection(inst)
+    cursor = conn.cursor()
+    cursor.execute("EXEC dbo.usp_RegionList ?",instancias.get('sales'))
+    print(cursor)
+    for row in cursor.fetchall():
+        regions.append({"group": row[0]})
+    conn.close()
+    return regions
+
+# ~~~~~~~~~~~~~~~~ Métodos Principales (render y controlers) ~~~~~~~~~~~~~~~~
 
 @consultas.route("/") #For default route
 def Index():
@@ -99,9 +115,40 @@ def consatrr():
         categories = complete_SelCat()
         return render_template('consulta_a.html', ventas = ventas, categories = categories)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta B
 @consultas.route("/consulta_b")
 def consulta_b():
-    return "Consulta B"
+    regions=complete_SelReg()
+    return render_template('consulta_b.html', regions=regions)
+
+@consultas.route("/consb", methods=['POST'])
+def consb():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        opt=request.form['Region']
+        productos = []
+        rowx=''
+        if inst == '':
+            flash('Error en la instancia seleccionada')
+            return redirect(url_for('consultas.Index'))
+        conn = connection(inst)
+        cursor = conn.cursor()
+        
+        #Se obtiene el producto con el primer procedimiento
+        cursor.execute("EXEC dbo.usp_ConsBProdSol ?,?,?",opt,instancias.get('sales'),instancias.get('production'))
+        row=cursor.fetchone()
+        rowx=str(row[2])
+        print(rowx)
+        #Se ejecuta otro query para obtener el valor del segundo procedimiento
+        cursor.execute("EXEC dbo.usp_ConsBTerr ?,?,?",opt,str(rowx),instancias.get('sales'))
+        row_f = cursor.fetchone()
+        productos.append({"TVentas": row[0], "Name": row[1], "Id": row[2], "Region": opt, "Territory": row_f[0]})
+        
+        conn.close()
+        regions=complete_SelReg()
+
+        return render_template('consulta_b.html', productos = productos, regions = regions)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Consulta E
 @consultas.route("/consulta_e")
