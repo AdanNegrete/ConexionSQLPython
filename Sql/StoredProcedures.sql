@@ -149,7 +149,7 @@ EXECUTE usp_ConsBTerr 'North America','782', 'SALESEX'
 /****************************************************************************/
 
 GO
-create or alter procedure cc_updateStock (@localidad varchar(10), @cat varchar(10),@InstP varchar(max)) as
+create or alter procedure usp_ConsCUpdtProd (@localidad varchar(10), @cat varchar(10),@InstP varchar(max)) as
 begin
 BEGIN  TRAN
 	DECLARE @SQLc nvarchar(max)
@@ -157,21 +157,21 @@ BEGIN  TRAN
 	
 	'if exists(select *
 		from ['+@InstP+'].AW_Equipo6.Production.ProductInventory as pii
-		where pii.LocationID = @localidad and
+		where pii.LocationID = '+@localidad+' and
 		ProductID in (
 			select ProductID
 			from ['+@InstP+'].AW_Equipo6.Production.ProductSubcategory
-			where ProductCategoryID = @cat
+			where ProductCategoryID = '+@cat+'
 		)) 
 		begin
 			update ['+@InstP+'].AW_Equipo6.Production.ProductInventory
 			set Quantity = Quantity + ROUND((Quantity * 0.05), 0)
 			from ['+@InstP+'].AW_Equipo6.Production.ProductInventory as pii
-			where pii.LocationID = @localidad and
+			where pii.LocationID = '+@localidad+' and
 			ProductID in (
 				select ProductID
 				from ['+@InstP+'].AW_Equipo6.Production.ProductSubcategory
-				where ProductCategoryID = @cat
+				where ProductCategoryID = '+@cat+'
 			)
 		end
 	else
