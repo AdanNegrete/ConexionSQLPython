@@ -1,0 +1,52 @@
+{% include 'header.html' %}
+
+{% with messages= get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+            {{message}}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+<form id="formulario" method="post" action="/consc">
+
+    <div class="card">
+        <div class="card-header">
+            Consulta C
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Actualizar Inventario</h5>
+            <p class="card-text">
+                Seleccione la categoría de productos y la localidad dentro de las que se actualizara el inventario.
+                <br/>
+                <div class="form-group">
+                    <label for="Categoria">Seleccione la Categoría: </label>
+                    <select id="Categoria" name="Categoria">
+                        {% for category in categories %}
+                            <option  value={{category.id}}>{{category.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <label for="Localidad">Seleccione la Localidad: </label>
+                    <select id="Localidad" name="Localidad">
+                        {% for location in locations %}
+                            <option  value={{location.id}}>{{location.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
+                        Actualizar
+                    </button>
+                </div>
+            </p>
+        </div>
+    </div>
+
+</form>
+{% include 'footer.html' %}

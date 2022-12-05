@@ -52,6 +52,19 @@ def complete_SelReg():
     conn.close()
     return regions
 
+def complete_SelLoc():
+    global instancias
+    global inst
+    locations = []
+    conn = connection(inst)
+    cursor = conn.cursor()
+    cursor.execute("EXEC dbo.usp_LocationList ?",instancias.get('production'))
+    print(cursor)
+    for row in cursor.fetchall():
+        locations.append({"id": row[0], "name": row[1]})
+    conn.close()
+    return locations
+
 # ~~~~~~~~~~~~~~~~ Métodos Principales (render y controlers) ~~~~~~~~~~~~~~~~
 
 @consultas.route("/") #For default route
@@ -149,6 +162,40 @@ def consb():
         regions=complete_SelReg()
 
         return render_template('consulta_b.html', productos = productos, regions = regions)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta C
+@consultas.route("/consulta_c")
+def consulta_c():
+    locations = complete_SelLoc()
+    categories = complete_SelCat()
+    return render_template('consulta_c.html', locations = locations, categories = categories)
+
+@consultas.route("/consc", methods=['POST'])
+def consc():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        opt_cat=request.form['Categoria']
+        opt_loc=request.form['Localidad']
+        print(opt_cat+'   '+opt_loc)
+        if not(opt_cat != '' and opt_loc != ''):
+            flash('Formulario incompleto')
+            return redirect(url_for('consultas.consulta_c'))
+        conn = connection(inst)
+        cursor = conn.cursor()
+        cursor.execute("EXEC dbo.usp_ConsCUpdtProd ?,?,?",opt_loc,opt_cat,instancias.get('production'))
+        row=cursor.fetchone()
+        respuesta = row[0];
+        conn.commit()
+        conn.close()
+        
+        if respuesta == 'Success':
+            flash('Valor Actualizado Correctamente')
+            return redirect(url_for('consultas.consulta_c'))
+        elif respuesta == 'NoProducts':
+            flash('No hay Productos de esa Categoría en la Localidad.')
+            return redirect(url_for('consultas.consulta_c'))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Consulta E
 @consultas.route("/consulta_e")

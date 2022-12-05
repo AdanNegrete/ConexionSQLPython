@@ -40,7 +40,18 @@ BEGIN TRAN
     EXEC sys.[sp_executesql] @SQL
 COMMIT TRAN
 END
-EXEC usp_RegionList 'SALESEX'
+
+--Procedimiento de listado de los localidades
+GO
+CREATE OR ALTER PROCEDURE usp_LocationList @Inst varchar(max) AS
+BEGIN
+BEGIN TRAN
+	DECLARE @SQL nvarchar(MAX)
+	SET @SQL = 'SELECT locationid as id, [name] as name FROM ['+@Inst+'].AW_Equipo6.Production.Location Order By id;'
+    EXEC sys.[sp_executesql] @SQL
+COMMIT TRAN
+END
+;
 /**********************************************************************************************/
 -- Consulta A
 -- Procedimiento de busqueda de ventas totales por territorio
@@ -149,42 +160,49 @@ EXECUTE usp_ConsBTerr 'North America','782', 'SALESEX'
 /****************************************************************************/
 
 GO
-create or alter procedure usp_ConsCUpdtProd (@localidad varchar(10), @cat varchar(10),@InstP varchar(max)) as
+create or alter procedure usp_ConsCUpdtProd (@localidad varchar(30), @cat varchar(30),@InstP varchar(max)) as
 begin
 BEGIN  TRAN
-	DECLARE @SQLc nvarchar(max)
-	SET @SQLc=
+	SET NOCOUNT ON
+	set xact_abort on
+	DECLARE @SQL nvarchar(max)
+	DECLARE @salida_c1 nvarchar(max)
+	DECLARE @params_c1 nvarchar(max)
+	SET @params_c1 = N'@salida_out_1 nvarchar(max) OUTPUT'
+
+	SET @SQL=
 	
-	'if exists(select *
-		from ['+@InstP+'].AW_Equipo6.Production.ProductInventory as pii
-		where pii.LocationID = '+@localidad+' and
-		ProductID in (
-			select ProductID
-			from ['+@InstP+'].AW_Equipo6.Production.ProductSubcategory
-			where ProductCategoryID = '+@cat+'
-		)) 
+	'if exists(select *	from ['+@InstP+'].AW_Equipo6.Production.ProductInventory as pii
+				where pii.LocationID = '+@localidad+' and ProductID in 
+					(select ProductID from ['+@InstP+'].AW_Equipo6.Production.ProductSubcategory
+						where ProductCategoryID = '+@cat+')) 
 		begin
 			update ['+@InstP+'].AW_Equipo6.Production.ProductInventory
 			set Quantity = Quantity + ROUND((Quantity * 0.05), 0)
 			from ['+@InstP+'].AW_Equipo6.Production.ProductInventory as pii
-			where pii.LocationID = '+@localidad+' and
-			ProductID in (
-				select ProductID
-				from ['+@InstP+'].AW_Equipo6.Production.ProductSubcategory
-				where ProductCategoryID = '+@cat+'
-			)
+			where pii.LocationID = '+@localidad+' and ProductID in 
+				(select ProductID from ['+@InstP+'].AW_Equipo6.Production.ProductSubcategory
+					where ProductCategoryID = '+@cat+')
+			SET @salida_out_1 = ''Success''
 		end
 	else
 		begin
-			SELECT NULL
+			SET @salida_out_1 = ''NoProducts''
 		end'
+	exec sys.[sp_executesql] @SQL,@params_c1,@salida_out_1 = @salida_c1 OUTPUT
 
 
-exec sys.[sp_executesql] @SQLc
+	SELECT @salida_c1
+
+	set xact_abort off
 COMMIT TRAN
-end
+END
 /**********************************************************************************************/
-EXEC cc_updateStock '60', '1'
+EXEC usp_ConsCUpdtProd '60', '1', 'NEGA-PC'
+select * from AW_Equipo6.Production.ProductInventory as pii
+				where pii.LocationID = '5' and ProductID in 
+					(select ProductID from AW_Equipo6.Production.ProductSubcategory
+						where ProductCategoryID = '3')
 go
 
 /**********************************************************************************************/
