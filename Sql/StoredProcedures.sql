@@ -410,35 +410,33 @@ execute usp_ConsHMejEmp '5', 'NEGA-PC', 'NEGA-PC'
 --Determinar paraun rango de fechas establecidas como argumento de entrada, 
 --cual es el total de las ventasen cada una de las regiones
 /****************************************************************************/
-Create or Alter procedure Grupos_I (@f1 date, @f2 date, @InstS varchar(max) ) as
-	begin
-		BEGIN TRAN
-		DECLARE @SQLi nvarchar(max)
-		SET @SQLi =
-		'select t.[Group], sum(sod.LineTotal) as VentasTotales
-			from ['+@InstS+'].AW_Equipo6.sales.SalesOrderHeader soh
-			inner join ['+@InstS+'].AW_Equipo6.sales.SalesOrderDetail sod
-			on soh.SalesOrderID = sod.SalesOrderID
-			inner join ['+@InstS+'].AW_Equipo6.sales.SalesTerritory t
-			on soh.TerritoryID = t.TerritoryID
-			where OrderDate between '+@f1+' AND '+@f2+'
-			group by t.[Group]
-		'
+GO
+CREATE OR ALTER PROCEDURE usp_ConsITotVen (@f1 varchar(max), @f2 varchar(max), @InstS varchar(max)) AS
+BEGIN
+	BEGIN TRAN
+	DECLARE @SQL nvarchar(max)
+	SET @SQL =
+	'select t.[Group], sum(sod.LineTotal) as VentasTotales
+		from ['+@InstS+'].AW_Equipo6.sales.SalesOrderHeader soh
+		inner join ['+@InstS+'].AW_Equipo6.sales.SalesOrderDetail sod
+		on soh.SalesOrderID = sod.SalesOrderID
+		inner join ['+@InstS+'].AW_Equipo6.sales.SalesTerritory t
+		on soh.TerritoryID = t.TerritoryID
+		where OrderDate between '+@f1+' AND '+@f2+'
+		group by t.[Group]'
 		
-		EXEC sys.[sp.executesql] @SQLi
-		COMMIT TRAN
-	end
-
-go
+	EXEC sys.[sp_executesql] @SQL
+	COMMIT TRAN
+END
 
 ------------------------------------------------------------------------------
-
-execute Grupos_I '2011-06-01', '2011-12-31', 'NEGA-PC'
+execute usp_ConsITotVen '2017-06-01', '2017-12-31', 'NEGA-PC'
 /****************************************************************************/
 -------------------------------  CONSULTA J  -------------------------------
 --Determinar los5 productos menos vendidos en un rango de fecha 
 --establecido como argumento de entrada
 /****************************************************************************/
+GO
 create procedure PeoresVenta (@f1 date, @f2 date) as
 begin
 	set nocount on;
