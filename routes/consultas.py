@@ -7,9 +7,9 @@ consultas.secret_key="ScrtKy"
 # ~~~~~~~~~~~~~~~~ Variables Globales ~~~~~~~~~~~~~~~~
 inst=''
 instancias={
-    'sales': 'NEGA-PC',
-    'production': 'NEGA-PC',
-    'other': 'NEGA-PC'
+    'sales': 'SALESAW',
+    'production': 'PRODUCTIONAW',
+    'other': 'OTHERAW'
 }
 
 # ~~~~~~~~~~~~~~~~ Métodos Auxiliares (Listas) ~~~~~~~~~~~~~~~~
@@ -258,6 +258,10 @@ def conse():
         elif respuesta == 'NoOrder':
             flash('El Producto No se Encuentra en la Orden.')
             return redirect(url_for('consultas.consulta_e'))
+        elif respuesta == 'Fail':
+            flash('Error al actualizar datos')
+            return redirect(url_for('consultas.consulta_e'))
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Consulta F
 @consultas.route("/consulta_f")

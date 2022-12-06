@@ -263,7 +263,7 @@ BEGIN
 						print 'Success'
 					end try
 					begin catch 
-						SET @msg = 'Fallo en la actualización'
+						SET @msg = 'Fail'
 					end catch
 				end
 			else
@@ -416,7 +416,7 @@ BEGIN
 	BEGIN TRAN
 	DECLARE @SQL nvarchar(max)
 	SET @SQL =
-	'select t.[Group], sum(sod.LineTotal) as VentasTotales
+		'select t.[Group], sum(sod.LineTotal) as VentasTotales
 		from ['+@InstS+'].AW_Equipo6.sales.SalesOrderHeader soh
 		inner join ['+@InstS+'].AW_Equipo6.sales.SalesOrderDetail sod
 		on soh.SalesOrderID = sod.SalesOrderID
