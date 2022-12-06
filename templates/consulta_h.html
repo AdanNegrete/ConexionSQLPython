@@ -1,0 +1,58 @@
+{% include 'header.html' %}
+<form id="formulario" method="post" action="/consh">
+
+    <div class="card">
+        <div class="card-header">
+            Consulta H
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Mejor Empleado de la Región</h5>
+            <p class="card-text">
+                Selecciona la región donde deseas encontrar al mejor empleado
+                <br/>
+                <div class="form-group">
+                    <label for="Territorio">Seleccione la Region: </label>
+                    <select id="Territorio" name="Territorio">
+                        {% for territory in territories %}
+                            <option  value={{territory.id}}>{{territory.name}}:{{territory.group}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
+                        Buscar
+                    </button>
+                </div>
+
+            </p>
+        </div>
+    </div>
+
+</form>
+<script></script>
+<div id="tabla_h">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Pedidos</th>
+            <th scope="col">Territorio</th>
+            <th scope="col">Region</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for persona in personas %}
+                <tr>
+                    <td>{{ persona.nombre }}</td>
+                    <td>{{ persona.apellido }}</td>
+                    <td>{{ persona.pedidos }}</td>
+                    <td>{{ persona.territorio }}</td>
+                    <td>{{ persona.region }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'footer.html' %}

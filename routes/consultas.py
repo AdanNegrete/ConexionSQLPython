@@ -78,6 +78,20 @@ def complete_SelMet():
     conn.close()
     return methods_u
 
+def complete_SelTerr():
+    global instancias
+    global inst
+    territories = []
+    conn = connection(inst)
+    cursor = conn.cursor()
+    cursor.execute("EXEC dbo.usp_TerritoryList ?",instancias.get('other'))
+    
+    for row in cursor.fetchall():
+        territories.append({"id": row[0], "name": row[1], "group": row[2]})
+    conn.close()
+    return territories
+
+
 # ~~~~~~~~~~~~~~~~ Métodos Principales (render y controlers) ~~~~~~~~~~~~~~~~
 
 @consultas.route("/") #For default route
@@ -307,3 +321,30 @@ def consg():
             flash('No se ha encontrado un cliente con la id ingresada')
             return redirect(url_for('consultas.consulta_g'))
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta H
+@consultas.route("/consulta_h")
+def consulta_h():
+    territories = complete_SelTerr()
+    return render_template('consulta_h.html', territories=territories)
+
+
+@consultas.route("/consh", methods=['POST'])
+def consh():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        opt=request.form['Territorio']
+        personas = []
+        if inst == '':
+            flash('Error en la instancia seleccionada')
+            return redirect(url_for('consultas.Index'))
+        conn = connection(inst)
+        cursor = conn.cursor()
+        cursor.execute("EXEC dbo.usp_ConsHMejEmp ?,?,?",opt,instancias.get('sales'),instancias.get('other'))
+        
+        for row in cursor.fetchall():
+            personas.append({"ID": row[0], "nombre": row[1], "apellido": row[2], "pedidos": row[3], "territorio": row[4], "region": row[5]})
+        conn.close()
+        territories = complete_SelTerr()
+        return render_template('consulta_h.html', territories = territories, personas = personas)

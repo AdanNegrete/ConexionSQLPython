@@ -3,7 +3,7 @@ CREATE OR ALTER PROCEDURE usp_TerritoryList @Inst varchar(max) AS
 BEGIN
 BEGIN TRAN
 	DECLARE @SQL nvarchar(MAX)
-	SET @SQL = 'SELECT territoryid as id, [name] as name FROM ['+@Inst+'].AW_Equipo6.sales.SalesTerritory;'
+	SET @SQL = 'SELECT territoryid as id, [name], [Group] FROM ['+@Inst+'].AW_Equipo6.sales.SalesTerritory;'
     EXEC sys.[sp_executesql] @SQL
 COMMIT TRAN
 END
@@ -106,6 +106,7 @@ go
 /**********************************************************************************************/
 -- Consulta B
 ----Determinar producto mas solicitado
+
 GO
 CREATE OR ALTER PROCEDURE usp_ConsBProdSol @p_group varchar(50), @InstS varchar(max), @InstP varchar(max) AS
 BEGIN
@@ -215,9 +216,10 @@ select * from AW_Equipo6.Production.ProductInventory as pii
 						where ProductCategoryID = '3')
 go
 
-/**********************************************************************************************/
--- Consulta E
--- Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
+/****************************************************************************/
+-------------------------------  CONSULTA E  -------------------------------
+--Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
+/****************************************************************************/
 GO
 CREATE OR ALTER PROCEDURE usp_ConsEUpdtSales (@cant varchar(max), @salesID varchar(20), @productID varchar(20), @InstS varchar(max), @InstP varchar(max)) AS
 BEGIN
@@ -379,22 +381,29 @@ where cum.customerid='11000'
 -------------------------------  CONSULTA H  -------------------------------
 --Determinar el empleado que atendió más ordenes por territorio/región
 /****************************************************************************/
-create or alter procedure MejorEmpleado (@territory varchar(3)) as
-	begin
-		begin tran
-		declare @sql nvarchar(max)
-		set @sql =
-			'select top 1 SalesPersonID, count(SalesPersonID) NumPedidos, TerritoryID 
-			from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader
-			where TerritoryID = '+@territory+'
-			group by SalesPersonID,TerritoryID
-			order by NumPedidos desc'
-		EXEC sys.[sp_executesql] @SQL
-		commit tran
-	end
-go
+GO
+CREATE OR ALTER PROCEDURE usp_ConsHMejEmp (@territory varchar(10), @InstS varchar(max), @InstO varchar(max)) as
+BEGIN
+	BEGIN TRAN
+	DECLARE @SQL nvarchar(max)
+	
+	SET @SQL =
+		'select top 1 soh.SalesPersonID,p.FirstName,p.LastName, count(soh.SalesPersonID) NumPedidos, T.[name] as Territory, T.[Group] as Region
+		from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader as soh
+		INNER JOIN ['+@InstS+'].AW_Equipo6.Sales.SalesTerritory AS T
+		ON T.territoryid=soh.territoryid
+		INNER JOIN ['+@InstO+'].AW_Equipo6.Other.Person AS p
+		ON p.BusinessEntityID=soh.salespersonid
+		where soh.TerritoryID = '+@territory+'
+		group by soh.SalesPersonID,p.FirstName,p.LastName,T.[name],T.[Group]
+		order by NumPedidos desc'
+	
+	EXEC sys.[sp_executesql] @SQL
+	COMMIT TRAN
+END
+GO
 ------------------------------------------------------------------------------
-execute MejorEmpleado @territory= 5
+execute usp_ConsHMejEmp '5', 'NEGA-PC', 'NEGA-PC'
 
 /****************************************************************************/
 -------------------------------  CONSULTA I  -------------------------------
