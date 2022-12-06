@@ -1,0 +1,47 @@
+{% include 'header.html' %}
+
+{% with messages= get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+            {{message}}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+<form id="formulario" method="post" action="/consf">
+
+    <div class="card">
+        <div class="card-header">
+            Consulta F
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Actualizar Método en Orden</h5>
+            <p class="card-text">
+                Seleccionará el nuevo método a ingresar en la orden solicitada.
+                <br/>
+                <div class="form-group">
+                    <label for="Metodo">Seleccione el Método: </label>
+                    <select id="Metodo" name="Metodo">
+                        {% for method in methods %}
+                            <option  value={{method.id}}>{{method.id}}:{{method.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="Orden">Ingresa el número de Orden </label>
+                    <input id="Orden" class="form-control" type="text" name="Orden">
+                </div>
+                <br/>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
+                        Actualizar
+                    </button>
+                </div>
+            </p>
+        </div>
+    </div>
+</form>
+{% include 'footer.html' %}

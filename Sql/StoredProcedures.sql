@@ -51,7 +51,17 @@ BEGIN TRAN
     EXEC sys.[sp_executesql] @SQL
 COMMIT TRAN
 END
-;
+
+--Procedimiento de listado de Métodos
+GO
+CREATE OR ALTER PROCEDURE usp_MethodList @Inst varchar(max) AS
+BEGIN
+BEGIN TRAN
+	DECLARE @SQL nvarchar(MAX)
+	SET @SQL = 'SELECT shipmethodid as id, [name] as name FROM ['+@Inst+'].AW_Equipo6.Other.ShipMethod Order By id;'
+    EXEC sys.[sp_executesql] @SQL
+COMMIT TRAN
+END
 /**********************************************************************************************/
 -- Consulta A
 -- Procedimiento de busqueda de ventas totales por territorio
@@ -286,19 +296,27 @@ BEGIN
 	SET NOCOUNT ON
 	set xact_abort ON
 	DECLARE @SQL nvarchar(max)
+	DECLARE @salida_c1 nvarchar(max)
+	DECLARE @params_c1 nvarchar(max)
+	SET @params_c1 = N'@salida_out_1 nvarchar(max) OUTPUT'
+
 	SET @SQL =
 		'if exists(select * from ['+@InstO+'].AW_Equipo6.Other.ShipMethod
 			where ShipMethodID = '+@method+')
 			begin
 				update ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader
 				set ShipMethodID = '+@method+'
-				where SalesOrderID = '+@salesID+'
+				where SalesOrderID = '+@salesID+';
+
+				SET @salida_out_1 = ''Success''
 			end
 		else
 			begin
-				select null --En caso de que no exista
+				SET @salida_out_1 = ''NotOrder''
 			end'
-	EXEC sys.[sp_executesql] @SQL
+	EXEC sys.[sp_executesql] @SQL,@params_c1,@salida_out_1 = @salida_c1 OUTPUT
+
+	SELECT @salida_c1
 	COMMIT TRAN
 	set xact_abort OFF
 END
@@ -306,7 +324,7 @@ go
 ------------------------------------------------------------------------------------------------------
 select SalesOrderID, ShipMethodID from AW_Equipo6.Sales.SalesOrderHeader WHERE Salesorderid='43659'
 exec usp_ConsFUpdtMet '3','43659', 'NEGA-PC','NEGA-PC'
-SELECT @@VERSION
+
 go
 
 /****************************************************************************/
