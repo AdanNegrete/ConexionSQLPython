@@ -10,13 +10,16 @@
             </script>
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand">Práctica Fragmentación</a>
             <button class="navbar-toggler" data-target="#my-nav" data-toggle="collapse" aria-controls="my-nav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div id="my-nav" class="collapse navbar-collapse">
                 <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{url_for('consultas.Index')}}">Inicio</a>
+                    </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="{{url_for('consultas.consulta_a')}}">Consulta a</a>
                     </li>
@@ -36,7 +39,7 @@
                         <a class="nav-link" href="{{url_for('consultas.consulta_f')}}">Consulta f</a>
                     </li>
                     <li class="nav-item active">
-                        <a class="nav-link" href="#">Consulta g</a>
+                        <a class="nav-link" href="{{url_for('consultas.consulta_g')}}">Consulta g</a>
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="#">Consulta h</a>

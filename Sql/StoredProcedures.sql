@@ -332,25 +332,48 @@ go
 --Actualizar el correo electrónico de una cliente que se reciba como argumento 
 --en la instrucción de actualización
 /****************************************************************************/
-create procedure UpdateEmail (@customerID varchar (10), @newEmail varchar(50)) as
-begin
-	if exists(select * from AdventureWorks2019.Sales.Customer
-	where CustomerID = @customerID and PersonID is not null)
-		begin
-			update AdventureWorks2019.Person.EmailAddress	
-			set EmailAddress = @newEmail
-			where BusinessEntityID = (
-				select PersonID from AdventureWorks2019.Sales.Customer
-				where CustomerID = @customerID)
-		end
-	else
-		begin
-			select null
-		end
-end
+CREATE OR ALTER PROCEDURE usp_ConsGUpdtEml (@customerID varchar(30), @newEmail nvarchar(50), @InstS varchar(max),@InstO varchar(max)) as
+BEGIN
+	BEGIN TRAN
+
+	SET NOCOUNT ON
+	set xact_abort ON
+	DECLARE @SQL nvarchar(max)
+	DECLARE @salida_c1 nvarchar(max)
+	DECLARE @params_c1 nvarchar(max)
+
+	SET @params_c1 = N'@salida_out_1 nvarchar(max) OUTPUT'
+	
+	SET @SQL =
+		'if exists(select * from ['+@InstS+'].AW_Equipo6.Sales.Customer
+		where CustomerID = '+@customerID+' and PersonID is not null)
+			begin
+				update ['+@InstO+'].AW_Equipo6.Other.EmailAddress	
+				set EmailAddress = '''+@newEmail+'''
+				where BusinessEntityID = (
+					select PersonID from ['+@InstS+'].AW_Equipo6.Sales.Customer
+					where CustomerID = '+@customerID+')
+
+					SET @salida_out_1 = ''Success''
+			end
+		else
+			begin
+				SET @salida_out_1 = ''NoCustomer''
+			end'
+	
+	EXEC sys.[sp_executesql] @SQL,@params_c1,@salida_out_1 = @salida_c1 OUTPUT
+
+	SELECT @salida_c1
+	COMMIT TRAN
+	set xact_abort OFF
+END
 go
 
-exec UpdateEmail @customerID = 11000, @newemail = 'ejemplo@mail.com'
+exec usp_ConsGUpdtEml '11000', 'ejemplo@mail.com', 'NEGA-PC', 'NEGA-PC'
+SELECT p.FIRSTNAME, ea.EmailAddress, cum.customerid FROM Other.Person as p
+inner join Other.EmailAddress AS ea ON ea.BusinessEntityID=p.BusinessEntityID
+inner join sales.customer AS cum ON cum.personid = ea.BusinessEntityID
+where cum.customerid='11000'
 
 /****************************************************************************/
 -------------------------------  CONSULTA H  -------------------------------

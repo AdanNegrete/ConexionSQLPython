@@ -10,29 +10,25 @@
 {% endif %}
 {% endwith %}
 
-<form id="formulario" method="post" action="/consf">
+<form id="formulario" method="post" action="/consg">
 
     <div class="card">
         <div class="card-header">
-            Consulta F
+            Consulta G
         </div>
         <div class="card-body">
-            <h5 class="card-title">Actualizar Método en una Orden</h5>
+            <h5 class="card-title">Actualizar el correo de un cliente.</h5>
             <p class="card-text">
-                Seleccionará el nuevo método a ingresar en la orden solicitada.
+                Ingrese la id del cliente al que se le actualizara el correo
                 <br/>
                 <div class="form-group">
-                    <label for="Metodo">Seleccione el Método: </label>
-                    <select id="Metodo" name="Metodo">
-                        {% for method_u in methods_u %}
-                            <option  value={{method_u.id}}>{{method_u.id}}:{{method_u.name}}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="Customer">Ingresa la id del cliente </label>
+                    <input id="Customer" class="form-control" type="text" name="Customer">
                 </div>
                 <br>
                 <div class="form-group">
-                    <label for="Orden">Ingresa el número de Orden </label>
-                    <input id="Orden" class="form-control" type="text" name="Orden">
+                    <label for="Email">Ingresa el nuevo email </label>
+                    <input id="Email" class="form-control" type="email" name="Email" placeholder="name@example.com">
                 </div>
                 <br/>
                 <div class="form-group">

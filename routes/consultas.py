@@ -275,3 +275,35 @@ def consf():
         elif respuesta == 'NotOrder':
             flash('No se encontró la orden solicitada')
             return redirect(url_for('consultas.consulta_f'))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta G
+@consultas.route("/consulta_g")
+def consulta_g():
+    return render_template('consulta_g.html')
+
+@consultas.route("/consg", methods=['POST'])
+def consg():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        opt_ctm=request.form['Customer']
+        opt_eml=request.form['Email']
+        if not(opt_ctm != '' and opt_eml != ''):
+            flash('Formulario incompleto')
+            return redirect(url_for('consultas.consulta_g'))
+        conn = connection(inst)
+        cursor = conn.cursor()
+        cursor.execute("EXEC dbo.usp_ConsGUpdtEml ?,?,?,?",opt_ctm,opt_eml,instancias.get('sales'),instancias.get('other'))
+        row=cursor.fetchone()
+        respuesta = row[0];
+        conn.commit()
+        conn.close()
+        
+        if respuesta == 'Success':
+            flash('Valor Actualizado Correctamente')
+            return redirect(url_for('consultas.consulta_g'))
+        elif respuesta == 'NoCustomer':
+            flash('No se ha encontrado un cliente con la id ingresada')
+            return redirect(url_for('consultas.consulta_g'))
+
