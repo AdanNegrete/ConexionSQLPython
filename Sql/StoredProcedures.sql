@@ -304,8 +304,8 @@ BEGIN
 END
 go
 ------------------------------------------------------------------------------------------------------
-select SalesOrderID, ShipMethodID from AW_Equipo6.Sales.SalesOrderHeader
-exec usp_ConsFUpdtMet '3','43659', 'Prueba','NEGA-PC'
+select SalesOrderID, ShipMethodID from AW_Equipo6.Sales.SalesOrderHeader WHERE Salesorderid='43659'
+exec usp_ConsFUpdtMet '3','43659', 'NEGA-PC','NEGA-PC'
 SELECT @@VERSION
 go
 
