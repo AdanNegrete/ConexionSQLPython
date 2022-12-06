@@ -72,7 +72,7 @@ def complete_SelMet():
     conn = connection(inst)
     cursor = conn.cursor()
     cursor.execute("EXEC dbo.usp_MethodList ?",instancias.get('other'))
-    print(cursor)
+    
     for row in cursor.fetchall():
         methods_u.append({"id": row[0], "name": row[1]})
     conn.close()
@@ -249,10 +249,10 @@ def conse():
 @consultas.route("/consulta_f")
 def consulta_f():
     methods_u = complete_SelMet()
-    return render_template('consulta_e.html', methods_u = methods_u)
+    return render_template('consulta_f.html', methods_u = methods_u)
 
 @consultas.route("/consf", methods=['POST'])
-def conse():
+def consf():
     global inst
     global instancias
     if request.method == 'POST':
@@ -260,10 +260,10 @@ def conse():
         opt_met=request.form['Metodo']
         if not(opt_met != '' and opt_ord != ''):
             flash('Formulario incompleto')
-            return redirect(url_for('consultas.consulta_e'))
+            return redirect(url_for('consultas.consulta_f'))
         conn = connection(inst)
         cursor = conn.cursor()
-        cursor.execute("EXEC dbo.usp_ConsFUpdtMet ?,?,?,?,?",opt_met,opt_ord,instancias.get('sales'),instancias.get('other'))
+        cursor.execute("EXEC dbo.usp_ConsFUpdtMet ?,?,?,?",opt_met,opt_ord,instancias.get('sales'),instancias.get('other'))
         row=cursor.fetchone()
         respuesta = row[0];
         conn.commit()

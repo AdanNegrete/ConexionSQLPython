@@ -24,8 +24,8 @@
                 <div class="form-group">
                     <label for="Metodo">Seleccione el Método: </label>
                     <select id="Metodo" name="Metodo">
-                        {% for method in methods %}
-                            <option  value={{method.id}}>{{method.id}}:{{method.name}}</option>
+                        {% for method_u in methods_u %}
+                            <option  value={{method_u.id}}>{{method_u.id}}:{{method_u.name}}</option>
                         {% endfor %}
                     </select>
                 </div>
