@@ -280,29 +280,33 @@ go
 --Actualizar el método de envío de una orden que se reciba como argumento 
 --en la instrucción de actualización
 /****************************************************************************/
-CREATE OR ALTER PROCEDURE UpdateShip (@method varchar(20), @salesID varchar(20)) as
-begin
-begin tran
-declare @sqlf nvarchar(max)
-set @sqlf =
-	'if exists(select * from ['+@InstS+'].AW_Equipo6.Purchasing.ShipMethod
-		where ShipMethodID = '+@method+')
-		begin
-			update ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader
-			set ShipMethodID = '+@method+'
-			where SalesOrderID = '+@salesID+'
-		end
-	else
-		begin
-			select null --En caso de que no exista
-		end'
-EXEC sys.[sp_executesql] @SQL
-commit tran
-end
+CREATE OR ALTER PROCEDURE usp_ConsFUpdtMet (@method varchar(50), @salesID varchar(50), @InstS varchar(max),@InstO varchar(max)) as
+BEGIN
+	BEGIN TRAN
+	SET NOCOUNT ON
+	set xact_abort ON
+	DECLARE @SQL nvarchar(max)
+	SET @SQL =
+		'if exists(select * from ['+@InstO+'].AW_Equipo6.Other.ShipMethod
+			where ShipMethodID = '+@method+')
+			begin
+				update ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader
+				set ShipMethodID = '+@method+'
+				where SalesOrderID = '+@salesID+'
+			end
+		else
+			begin
+				select null --En caso de que no exista
+			end'
+	EXEC sys.[sp_executesql] @SQL
+	COMMIT TRAN
+	set xact_abort OFF
+END
 go
 ------------------------------------------------------------------------------------------------------
-select SalesOrderID, ShipMethodID from AdventureWorks2019.Sales.SalesOrderHeader
-exec UpdateShip @method = 3,@salesID = 43659
+select SalesOrderID, ShipMethodID from AW_Equipo6.Sales.SalesOrderHeader
+exec usp_ConsFUpdtMet '3','43659', 'Prueba','NEGA-PC'
+SELECT @@VERSION
 go
 
 /****************************************************************************/

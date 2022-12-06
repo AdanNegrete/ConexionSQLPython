@@ -61,12 +61,11 @@ select Salesorderid, orderdate, duedate, shipdate
    status, OnlineOrderFlag, salesordernumber,
    purchaseordernumber, accountnumber, customerid,
    salespersonid, territoryid,  currencyrateID,
-   subtotal, TaxAmt, freight, totaldue 
+   subtotal, TaxAmt, freight, totaldue, ShipMethodID
    into Sales.SalesOrderHeader
    --from LinkedServer.AdventureWorks2019.Sales.SalesOrderHeader
    from AdventureWorks2019.Sales.SalesOrderHeader
    Select * from sales.SalesOrderHeader
-
 ------------------------------------------------------------------------------ LISTO
 select salesorderid, salesorderdetailid, 
    carriertrackingnumber, orderqty, productid,
