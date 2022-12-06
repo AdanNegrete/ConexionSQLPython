@@ -280,7 +280,7 @@ go
 --Actualizar el método de envío de una orden que se reciba como argumento 
 --en la instrucción de actualización
 /****************************************************************************/
-create or alter procedure UpdateShip (@method varchar(20), @salesID varchar(20)) as
+CREATE OR ALTER PROCEDURE UpdateShip (@method varchar(20), @salesID varchar(20)) as
 begin
 begin tran
 declare @sqlf nvarchar(max)

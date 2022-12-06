@@ -141,6 +141,7 @@ if not exists (select productID
 /************************************************
     Segmentación del esquema OTHER
 ***********************************************/
+go
 create schema Other
 go
 
@@ -177,3 +178,7 @@ Employee
 	select BusinessEntityID, NationalIDNumber, JobTitle 
 	into Other.Employee
 	from AdventureWorks2019.HumanResources.Employee
+/**********************************************************************************************/
+	select ShipMethodID, [Name], ShipBase, ShipRate, ModifiedDate, rowguid 
+	into Other.ShipMethod
+	from AdventureWorks2019.Purchasing.ShipMethod
