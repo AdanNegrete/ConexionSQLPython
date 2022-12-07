@@ -8,7 +8,6 @@ BEGIN TRAN
 COMMIT TRAN
 END
 
-exec usp_TerritoryList 'NEGA-PC'
 --Procedimiento de listado de las categorias
 GO
 CREATE OR ALTER PROCEDURE usp_CategoryList @Inst varchar(max) AS
