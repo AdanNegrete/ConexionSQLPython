@@ -384,3 +384,35 @@ def consi():
             ventas.append({"Region": row[0], "VentasTotales": row[1]})
         conn.close()
         return render_template('consulta_i.html', ventas = ventas)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta J
+@consultas.route("/consulta_j")
+def consulta_j():
+    return render_template('consulta_j.html')
+
+@consultas.route("/consj", methods=['POST'])
+def consj():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        productos=[]
+        opt=request.form['daterange']
+        if opt == '':
+            flash('No se han seleccionado fechas')
+            return redirect(url_for('consultas.consulta_j'))
+        
+        fechas = opt.split(" - ")
+        
+        fechaini=fechas[0].split("/")
+        fecha_i=fechaini[2]+'-'+fechaini[0]+'-'+fechaini[1]
+        
+        fechafin=fechas[1].split("/")
+        fecha_f=fechafin[2]+'-'+fechafin[0]+'-'+fechafin[1]
+
+        conn = connection(inst)
+        cursor = conn.cursor()
+        cursor.execute("EXEC usp_ConsJPrsVen ?,?,?,?",fecha_i,fecha_f,instancias.get('sales'),instancias.get('production'))
+        for row in cursor.fetchall():
+            productos.append({"Nombre": row[0], "Ventas": row[1]})
+        conn.close()
+        return render_template('consulta_j.html', productos=productos)

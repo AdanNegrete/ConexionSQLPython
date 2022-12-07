@@ -1,0 +1,50 @@
+{% include 'header.html' %}
+
+<form id="formulario" method="post" action="/consj">
+
+    <div class="card">
+        <div class="card-header">
+            Consulta J
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">5 Productos Menos Vendidos</h5>
+            <p class="card-text">
+                Selecciona el rango de fechas en las que deseas conocer los productos menos vendidos por region.
+                <br/>
+                <div class="form-group">
+                    <label for="daterange">Seleccione las fechas: </label>
+                    {% include 'calendar.html' %}
+                </div>
+                <br/>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
+                        Buscar
+                    </button>
+                </div>
+
+            </p>
+        </div>
+    </div>
+
+</form>
+<script></script>
+<div id="tabla_i">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Producto</th>
+            <th scope="col">Ventas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.Nombre }}</th>
+                    <td>{{ producto.Ventas }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include 'footer.html' %}

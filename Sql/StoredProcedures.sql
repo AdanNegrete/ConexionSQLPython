@@ -223,20 +223,22 @@ go
 /****************************************************************************/
 
 go
-create or alter procedure territorio (@IDterritorio nvarchar(20))as
-begin
-declare @strSql nvarchar (1000)
-set @strSql = N'select Sales.Customer.CustomerID
-from Sales.Customer 
-inner join Sales.SalesOrderHeader 
-on Sales.Customer.TerritoryID != Sales.SalesOrderHeader.TerritoryID
-and Sales.Customer.CustomerID = Sales.SalesOrderHeader.CustomerID
-where Sales.Customer.TerritoryID=' +' ''' + @IDterritorio + ''' '
-execute(@strSql)
-end
+CREATE OR ALTER PROCEDURE usp_ConsDOrdTerrDis (@territory varchar(20), @InstS varchar(max))as
+BEGIN
+	BEGIN TRAN
+	DECLARE @SQL nvarchar(max)
+	SET @SQL = 
+		'select cus.CustomerID from ['+@InstS+'].AW_Equipo6.Sales.Customer as cus
+		inner join ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader as soh
+		on cus.TerritoryID != soh.TerritoryID and cus.CustomerID = soh.CustomerID
+		where cus.TerritoryID='''+@territory+''''
+
+	EXEC sys.[sp_executesql] @SQL
+	COMMIT TRAN
+END
 go
 
-exec territorio @IDterritorio='12'
+exec usp_ConsDOrdTerrDis '12','NEGA-PC'
 
 /****************************************************************************/
 -------------------------------  CONSULTA E  -------------------------------
@@ -459,20 +461,27 @@ execute usp_ConsITotVen '2011-06-01', '2011-12-31', 'NEGA-PC'
 --establecido como argumento de entrada
 /****************************************************************************/
 GO
-create procedure PeoresVenta (@f1 date, @f2 date) as
-begin
-	set nocount on;
-	select top 5 sod.ProductID, sum(sod.LineTotal) Ventas
-	from AdventureWorks2019.Sales.SalesOrderHeader soh
-inner join AdventureWorks2019.Sales.SalesOrderDetail sod
-	on soh.SalesOrderID = sod.SalesOrderID
-	where OrderDate BETWEEN @f1 AND @f2
-	group by sod.ProductID
-	order by ventas desc
-end
+CREATE OR ALTER PROCEDURE usp_ConsJPrsVen (@f1 varchar(max), @f2 varchar(max), @InstS varchar(max), @InstP varchar(max)) AS
+BEGIN
+	BEGIN TRAN
+	SET NOCOUNT ON
+	DECLARE @SQL nvarchar(max)
+	SET @SQL =
+		'select top 5 p.[name], sum(sod.LineTotal) Ventas
+		from ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader soh
+		inner join ['+@InstS+'].AW_Equipo6.Sales.SalesOrderDetail sod
+		on soh.SalesOrderID = sod.SalesOrderID
+		inner join ['+@InstP+'].AW_Equipo6.Production.Product p
+		on sod.ProductID = p.ProductID
+		where OrderDate BETWEEN '''+@f1+''' AND '''+@f2+'''
+		group by p.[name]
+		order by ventas ASC'
+	EXEC sys.[sp_executesql] @SQL
+	COMMIT TRAN
+END
 go
 ------------------------------------------------------------------------------
-exec PeoresVenta '2011-05-01','2011-05-31';
+exec usp_ConsJPrsVen '2011-05-01','2011-05-31','NEGA-PC','NEGA-PC';
 go
 
 
