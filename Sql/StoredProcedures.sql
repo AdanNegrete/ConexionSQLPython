@@ -217,6 +217,28 @@ select * from AW_Equipo6.Production.ProductInventory as pii
 go
 
 /****************************************************************************/
+-------------------------------  CONSULTA D  -------------------------------
+--Determinar si hay clientes de un territorio que se especifique 
+--como argumento de entrada
+/****************************************************************************/
+
+go
+create or alter procedure territorio (@IDterritorio nvarchar(20))as
+begin
+declare @strSql nvarchar (1000)
+set @strSql = N'select Sales.Customer.CustomerID
+from Sales.Customer 
+inner join Sales.SalesOrderHeader 
+on Sales.Customer.TerritoryID != Sales.SalesOrderHeader.TerritoryID
+and Sales.Customer.CustomerID = Sales.SalesOrderHeader.CustomerID
+where Sales.Customer.TerritoryID=' +' ''' + @IDterritorio + ''' '
+execute(@strSql)
+end
+go
+
+exec territorio @IDterritorio='12'
+
+/****************************************************************************/
 -------------------------------  CONSULTA E  -------------------------------
 --Actualizar  la  cantidad  de  productos  de  una  orden  que  se  provea
 /****************************************************************************/

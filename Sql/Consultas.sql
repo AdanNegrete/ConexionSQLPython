@@ -114,13 +114,21 @@ exec cc_updateLocation @localidad = 60, @cat = 1
 --como argumento de entrada
 /****************************************************************************/
 
-select t.[group], sod.ProductID, count(ProductId) as col
-from AdventureWorks2019.sales.SalesOrderDetail sod
-inner join AdventureWorks2019.sales.SalesOrderHeader soh
-on sod.SalesOrderID = soh.SalesOrderID
-inner join AdventureWorks2019.sales.SalesTerritory t
-on soh.TerritoryID = t.TerritoryID
-group by t.[Group], sod.ProductID
+go
+create or alter procedure territorio (@IDterritorio nvarchar(20))as
+begin
+declare @strSql nvarchar (1000)
+set @strSql = N'select Sales.Customer.CustomerID
+from Sales.Customer 
+inner join Sales.SalesOrderHeader 
+on Sales.Customer.TerritoryID != Sales.SalesOrderHeader.TerritoryID
+and Sales.Customer.CustomerID = Sales.SalesOrderHeader.CustomerID
+where Sales.Customer.TerritoryID=' +' ''' + @IDterritorio + ''' '
+execute(@strSql)
+end
+go
+
+exec territorio @IDterritorio='12'
 
 /****************************************************************************/
 -------------------------------  CONSULTA E  -------------------------------
