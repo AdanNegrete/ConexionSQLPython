@@ -1,0 +1,61 @@
+{% include 'header.html' %}
+
+{% with messages= get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+            {{message}}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+<form id="formulario" method="post" action="/consd">
+
+    <div class="card">
+        <div class="card-header">
+            Consulta D
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Clientes con Compras fuera de tu reacción.</h5>
+            <p class="card-text">
+                Seleccione los trabajadores.
+                <br/>
+                <div class="form-group">
+                    <label for="Territorio">Seleccione la Region: </label>
+                    <select id="Territorio" name="Territorio">
+                        {% for territory in territories %}
+                            <option  value={{territory.id}}>{{territory.name}}:{{territory.group}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
+                        Buscar
+                    </button>
+                </div>
+
+            </p>
+        </div>
+    </div>
+
+</form>
+<script></script>
+<div id="tabla_h">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in Usuarios %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'footer.html' %}

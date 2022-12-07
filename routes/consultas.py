@@ -223,6 +223,38 @@ def consc():
         elif respuesta == 'NoProducts':
             flash('No hay Productos de esa Categoría en la Localidad.')
             return redirect(url_for('consultas.consulta_c'))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta D
+@consultas.route("/consulta_d")
+def consulta_d():
+    territories = complete_SelTerr()
+    return render_template('consulta_d.html', territories=territories)
+
+@consultas.route("/consd", methods=['POST'])
+def consd():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        opt=request.form['Territorio']
+        Usuarios = []
+        if inst == '':
+            flash('Error en la instancia seleccionada')
+            return redirect(url_for('consultas.Index'))
+        conn = connection(inst)
+        cursor = conn.cursor()
+        cursor.execute("EXEC usp_ConsDOrdTerrDis ?,?",opt,instancias.get('sales'))
+        
+        if cursor == None:
+            flash('No se encontraron clientes con compras fuera de su territorio')
+            return redirect(url_for('consultas.consulta_d'))
+        else:
+            print(cursor)
+            for row in cursor.fetchall():
+                Usuarios.append({"ID": row[0]})
+            conn.close()
+            territories = complete_SelTerr()
+            return render_template('consulta_d.html', territories = territories, Usuarios=Usuarios)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Consulta E
 @consultas.route("/consulta_e")

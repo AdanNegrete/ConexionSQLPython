@@ -8,6 +8,7 @@ BEGIN TRAN
 COMMIT TRAN
 END
 
+exec usp_TerritoryList 'NEGA-PC'
 --Procedimiento de listado de las categorias
 GO
 CREATE OR ALTER PROCEDURE usp_CategoryList @Inst varchar(max) AS
@@ -221,7 +222,6 @@ go
 --Determinar si hay clientes de un territorio que se especifique 
 --como argumento de entrada
 /****************************************************************************/
-
 go
 CREATE OR ALTER PROCEDURE usp_ConsDOrdTerrDis (@territory varchar(20), @InstS varchar(max))as
 BEGIN
@@ -231,14 +231,14 @@ BEGIN
 		'select cus.CustomerID from ['+@InstS+'].AW_Equipo6.Sales.Customer as cus
 		inner join ['+@InstS+'].AW_Equipo6.Sales.SalesOrderHeader as soh
 		on cus.TerritoryID != soh.TerritoryID and cus.CustomerID = soh.CustomerID
-		where cus.TerritoryID='''+@territory+''''
+		where cus.TerritoryID='+@territory+';'
 
 	EXEC sys.[sp_executesql] @SQL
 	COMMIT TRAN
 END
 go
 
-exec usp_ConsDOrdTerrDis '12','NEGA-PC'
+exec usp_ConsDOrdTerrDis '7','NEGA-PC'
 
 /****************************************************************************/
 -------------------------------  CONSULTA E  -------------------------------
