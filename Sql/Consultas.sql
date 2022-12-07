@@ -244,9 +244,10 @@ execute MejorEmpleado @territory= 5
 /****************************************************************************/
 -------------------------------  CONSULTA I  -------------------------------
 --Determinar paraun rango de fechas establecidas como argumento de entrada, 
---cual es el total de las ventasen cada una de las regiones
+--cual es el total de las ventas en cada una de las regiones
 /****************************************************************************/
-create procedure GruposI (@f1 varchar(50), @f2 varchar(50)) as
+go
+create or alter procedure GruposI (@f1 date, @f2 date) as
 	begin
 		select t.[Group], sum(sod.LineTotal) as VentasTotales
 		from AdventureWorks2019.sales.SalesOrderHeader soh
@@ -266,7 +267,8 @@ execute GruposI @f1 = '2011-06-01', @f2 = '2011-12-31'
 --Determinar los5 productos menos vendidos en un rango de fecha 
 --establecido como argumento de entrada
 /****************************************************************************/
-create procedure PeoresVentas (@f1 date, @f2 date) as
+go
+create or alter procedure PeoresVentas (@f1 date, @f2 date) as
 begin
 	set nocount on;
 	select top 5 sod.ProductID, sum(sod.LineTotal) Ventas
@@ -279,6 +281,6 @@ inner join AdventureWorks2019.Sales.SalesOrderDetail sod
 end
 go
 ------------------------------------------------------------------------------
-exec JFechas'2011-05-01','2011-05-31';
+exec PeoresVentas @f1 = '2011-05-01',@f2 = '2011-05-31'
 go
 
