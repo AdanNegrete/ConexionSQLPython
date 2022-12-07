@@ -7,9 +7,9 @@ consultas.secret_key="ScrtKy"
 # ~~~~~~~~~~~~~~~~ Variables Globales ~~~~~~~~~~~~~~~~
 inst=''
 instancias={
-    'sales': 'SALESAW',
-    'production': 'PRODUCTIONAW',
-    'other': 'OTHERAW'
+    'sales': 'NEGA-PC',
+    'production': 'NEGA-PC',
+    'other': 'NEGA-PC'
 }
 
 # ~~~~~~~~~~~~~~~~ Métodos Auxiliares (Listas) ~~~~~~~~~~~~~~~~
@@ -352,3 +352,35 @@ def consh():
         conn.close()
         territories = complete_SelTerr()
         return render_template('consulta_h.html', territories = territories, personas = personas)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Consulta I
+@consultas.route("/consulta_i")
+def consulta_i():
+    return render_template('consulta_i.html')
+
+@consultas.route("/consi", methods=['POST'])
+def consi():
+    global inst
+    global instancias
+    if request.method == 'POST':
+        ventas=[]
+        opt=request.form['daterange']
+        if opt == '':
+            flash('No se han seleccionado fechas')
+            return redirect(url_for('consultas.consulta_i'))
+        
+        fechas = opt.split(" - ")
+        
+        fechaini=fechas[0].split("/")
+        fecha_i=fechaini[2]+'-'+fechaini[0]+'-'+fechaini[1]
+        
+        fechafin=fechas[1].split("/")
+        fecha_f=fechafin[2]+'-'+fechafin[0]+'-'+fechafin[1]
+
+        conn = connection(inst)
+        cursor = conn.cursor()
+        cursor.execute("EXEC usp_ConsITotVen ?,?,?",fecha_i,fecha_f,instancias.get('sales'))
+        for row in cursor.fetchall():
+            ventas.append({"Region": row[0], "VentasTotales": row[1]})
+        conn.close()
+        return render_template('consulta_i.html', ventas = ventas)

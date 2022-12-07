@@ -1,0 +1,50 @@
+{% include 'header.html' %}
+
+<form id="formulario" method="post" action="/consi">
+
+    <div class="card">
+        <div class="card-header">
+            Consulta I
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Ventas Por Región</h5>
+            <p class="card-text">
+                Selecciona el rango de fechas en las que deseas conocer las ventas totales por región.
+                <br/>
+                <div class="form-group">
+                    <label for="daterange">Seleccione las fechas: </label>
+                    {% include 'calendar.html' %}
+                </div>
+                <br/>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" id="btn-cons">
+                        Buscar
+                    </button>
+                </div>
+
+            </p>
+        </div>
+    </div>
+
+</form>
+<script></script>
+<div id="tabla_i">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Región</th>
+            <th scope="col">Ventas Totales</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+                <tr>
+                    <td>{{ venta.Region }}</th>
+                    <td>{{ venta.VentasTotales }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include 'footer.html' %}

@@ -444,7 +444,7 @@ BEGIN
 		on soh.SalesOrderID = sod.SalesOrderID
 		inner join ['+@InstS+'].AW_Equipo6.sales.SalesTerritory t
 		on soh.TerritoryID = t.TerritoryID
-		where OrderDate between '+@f1+' AND '+@f2+'
+		where OrderDate between '''+@f1+''' AND '''+@f2+'''
 		group by t.[Group]'
 		
 	EXEC sys.[sp_executesql] @SQL
@@ -452,7 +452,7 @@ BEGIN
 END
 
 ------------------------------------------------------------------------------
-execute usp_ConsITotVen '2017-06-01', '2017-12-31', 'NEGA-PC'
+execute usp_ConsITotVen '2011-06-01', '2011-12-31', 'NEGA-PC'
 /****************************************************************************/
 -------------------------------  CONSULTA J  -------------------------------
 --Determinar los5 productos menos vendidos en un rango de fecha 
