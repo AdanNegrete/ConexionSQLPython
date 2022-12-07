@@ -250,10 +250,10 @@ go
 create or alter procedure GruposI (@f1 date, @f2 date) as
 	begin
 		select t.[Group], sum(sod.LineTotal) as VentasTotales
-		from AdventureWorks2019.sales.SalesOrderHeader soh
-		inner join AdventureWorks2019.sales.SalesOrderDetail sod
+		from Equipo6.sales.SalesOrderHeader soh
+		inner join Equipo6.sales.SalesOrderDetail sod
 		on soh.SalesOrderID = sod.SalesOrderID
-		inner join AdventureWorks2019.sales.SalesTerritory t
+		inner join Equipo6.sales.SalesTerritory t
 		on soh.TerritoryID = t.TerritoryID
 		where OrderDate between @f1 AND @f2
 		group by t.[Group]
@@ -272,8 +272,8 @@ create or alter procedure PeoresVentas (@f1 date, @f2 date) as
 begin
 	set nocount on;
 	select top 5 sod.ProductID, sum(sod.LineTotal) Ventas
-	from AdventureWorks2019.Sales.SalesOrderHeader soh
-inner join AdventureWorks2019.Sales.SalesOrderDetail sod
+	from Equipo6.Sales.SalesOrderHeader soh
+inner join Equipo6.Sales.SalesOrderDetail sod
 	on soh.SalesOrderID = sod.SalesOrderID
 	where OrderDate BETWEEN @f1 AND @f2
 	group by sod.ProductID
